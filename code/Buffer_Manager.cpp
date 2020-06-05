@@ -48,12 +48,12 @@ inline int Page::getBlockId()
 	return block_id_;
 }
 
-inline void Page::setPin(bool pin_state)
+inline void Page::setPin(int pin_state)
 {
 	pin_ = pin_state;
 }
 
-inline bool Page::getPin()
+inline int Page::getPin()
 {
 	return pin_;
 }
@@ -76,4 +76,9 @@ inline void Page::setRefer(bool reference_state)
 inline bool Page::getRefer()
 {
 	return reference_;
+}
+
+inline char *Page::getBuffer()
+{
+	return content_;
 }

@@ -12,30 +12,40 @@
 class Page 
 {
 private:
+	//块号
 	int block_id_;
+	//文件名
 	std::string file_name_;
+	//Page内容
 	char content_[PAGESIZE];
-	bool pin_;
+	//pin的数量
+	int pin_;
+	//是否为脏块
 	bool dirty_;
+	//用于替换策略变量
 	bool reference_;
 public:
+	//默认构造函数
 	Page();
+	//初始化函数
 	void initialize();
-
+	// get和set函数
 	void setFileName(string n);
 	std::string getFileName();
-
+	
 	void setBlockId(int block_id);
 	int getBlockId();
 
-	void setPin(bool pin);
-	bool getPin();
+	void setPin(int pin);
+	int getPin();
 
 	void setDirty(bool dirty);
 	bool getDirty();
 
 	void setRefer(bool reference);
 	bool getRefer();
+
+	char *getBuffer();
 };
 
 class BufferManager
