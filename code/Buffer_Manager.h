@@ -8,10 +8,13 @@
 
 #define MAXPAGEPOOLSIZE 102400
 #define PAGESIZE 4096
+#define PAGENOTEXIST -1
 
 class Page 
 {
 private:
+    //有效位
+    bool valid_;
 	//块号
 	int block_id_;
 	//文件名
@@ -30,11 +33,14 @@ public:
 	//初始化函数
 	void initialize();
 	// get和set函数
+    void setValid(bool valid);
+    bool getValid();
+
 	void setFileName(string n);
 	std::string getFileName();
 	
-	void setBlockId(int block_id);
-	int getBlockId();
+	void setBlockID(int block_id);
+	int getBlockID();
 
 	void setPin(int pin);
 	int getPin();
@@ -82,8 +88,8 @@ private:
     Page* page_pool_;
     //缓冲池大小
     int page_pool_size_;
-    //需要进行替换的page的id的一个指针
-    int replace_pointer_;
+    //需要进行替换的page的id的一个指针（暂时不需要，后面可以考虑删除该field）
+    // int replace_pointer_;
     //初始化函数，仅在构造函数中调用
     void initialize(int page_num);
     //提供（返回）一个可以用于存放数据的page的序号
