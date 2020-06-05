@@ -70,9 +70,9 @@ public:
     //标记第page_id个page为dirty
     int markPageDirty(int page_id);
     //钉住第page_id个page：pin_count++；返回改变后的pin_count
-    int pinPage();
-    //解除page_id的钉住状态：pin_count--；返回改变后的pin_count
-    int unpinPage();
+    int pinPage(int page_id);
+    //解除第page_id个page的钉住状态：pin_count--；返回改变后的pin_count
+    int unpinPage(int page_id);
     //将page_pool_中的第page_id个page写到磁盘；返回1表示输出成功，返回0表示输出失败
     int outputPage(int page_id);
     //int outputPage(int page_id, std::string file_name, int block_id);
