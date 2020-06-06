@@ -1,8 +1,9 @@
 #pragma once
 #ifndef _BUFFER_MANAGER_H_
 #define _BUFFER_MANAGER_H_
-
+#define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
+#include<stdio.h>
 #include <cstdio>
 #include <string>
 
@@ -36,7 +37,7 @@ public:
     void setValid(bool valid);
     bool getValid();
 
-	void setFileName(string n);
+	void setFileName(std::string n);
 	std::string getFileName();
 	
 	void setBlockID(int block_id);
@@ -74,7 +75,7 @@ public:
     //返回file_name文件的block_id块在page_pool_中page序号
     int fetchPageID(std::string file_name, int block_id);
     //标记第page_id个page为dirty
-    int markPageDirty(int page_id);
+    void markPageDirty(int page_id);
     //钉住第page_id个page：pin_count++；返回改变后的pin_count
     int pinPage(int page_id);
     //解除第page_id个page的钉住状态：pin_count--；返回改变后的pin_count

@@ -1,13 +1,13 @@
 #include "Buffer_Manager.h"
 
-inline void BufferManager::initialize(int page_num)
+ void BufferManager::initialize(int page_num)
 {
     page_pool_ = new Page[page_num];
     page_pool_size_ = page_num;
-    replace_pointer_ = 0;
+//    replace_pointer_ = 0;
 }
 
-void BufferManager::~BufferManager()
+BufferManager::~BufferManager()
 {
     for(int i = 0; i < page_pool_size_; i++)
         outputPage(i);
@@ -21,9 +21,10 @@ Page::Page() {
 void Page::initialize() {
 	file_name_ = "";
 	block_id_ = -1;         
-	pin_ = false;
+	pin_ = 0;
 	dirty_ = false;
 	reference_ = false;
+	valid_ = false;
 	for (int i = 0; i < PAGESIZE; i++)
 		content_[i] = '\0';
 }
@@ -38,67 +39,141 @@ bool Page::getValid()
 	return valid_;
 }
 
-inline void Page::setFileName(std::string n)
+ void Page::setFileName(std::string n)
 {
 	file_name_ = n;
 }
 
-inline std::string Page::getFileName()
+ std::string Page::getFileName()
 {
 	return file_name_;
 }
 
-inline void Page::setBlockID(int block)
+ void Page::setBlockID(int block)
 {
 	block_id_ = block;
 }
 
-inline int Page::getBlockID()
+ int Page::getBlockID()
 {
 	return block_id_;
 }
 
-inline void Page::setPin(int pin_state)
+ void Page::setPin(int pin_state)
 {
 	pin_ = pin_state;
 }
 
-inline int Page::getPin()
+ int Page::getPin()
 {
 	return pin_;
 }
 
-inline void Page::setDirty(bool dirty_state)
+ void Page::setDirty(bool dirty_state)
 {
 	dirty_ = dirty_state;
 }
 
-inline bool Page::getDirty()
+ bool Page::getDirty()
 {
 	return dirty_;
 }
 
-inline void Page::setRefer(bool reference_state)
+ void Page::setRefer(bool reference_state)
 {
 	reference_ = reference_state;
 }
 
-inline bool Page::getRefer()
+ bool Page::getRefer()
 {
 	return reference_;
 }
 
-inline char *Page::getBuffer()
+ char *Page::getBuffer()
 {
 	return content_;
 }
 
 
 /*------------------ new code added below -------------------*/
+void BufferManager::markPageDirty(int page_id)
+{
+	page_pool_[page_id].setDirty(true);
+}
+
+int BufferManager::pinPage(int page_id)
+{
+	int newpin = page_pool_[page_id].getPin()+1;
+	page_pool_[page_id].setPin(newpin);
+	return newpin;
+}
+
+int BufferManager::unpinPage(int page_id)
+{
+	int newpin = page_pool_[page_id].getPin() -1;
+	//如果本身处于pin住的状态
+	if (newpin >= 0)    
+		page_pool_[page_id].setPin(newpin);
+	//如果本身处于未pin住的状态
+	else page_pool_[page_id].setPin(0);
+	return page_pool_[page_id].getPin();
+}
+
+int BufferManager::outputPage(int page_id)
+{
+	std::string filename = page_pool_[page_id].getFileName();
+	int blockid = page_pool_[page_id].getBlockID();
+	//若此Page为有效的Page，即内部内容有意义
+	if (page_pool_[page_id].getValid())
+	{
+		FILE* f = fopen(filename.c_str(), "r+");
+		if (f == NULL)
+		{
+			std::cout << "File open fail!" << std::endl;
+			return 0;
+		}
+		fseek(f, PAGESIZE * blockid, SEEK_SET);
+		char* buffer = page_pool_[page_id].getBuffer();
+		// 将内存页的内容写入磁盘块
+		fwrite(buffer, PAGESIZE, 1, f);
+		// 关闭文件
+		fclose(f);
+		return 1;
+	}
+	return 0;
+}
+
+int BufferManager::loadDiskBlock2Page(int page_id, std::string file_name, int block_id)
+{
+	// 打开磁盘文件
+	FILE* f = fopen(file_name.c_str(), "r");
+	if (f == NULL)
+	{
+		std::cout << "File not exist!" << std::endl;
+		//失败返回
+		return 0;                    
+	}
+	fseek(f, PAGESIZE * block_id, SEEK_SET);
+	char* buffer = page_pool_[page_id].getBuffer();
+	// 读取对应磁盘块到内存页
+	fread(buffer, PAGESIZE, 1, f);
+	// 关闭文件
+	fclose(f);
+	// 对新载入的页进行相应设置
+	page_pool_[page_id].setFileName(file_name);
+	page_pool_[page_id].setBlockID(block_id);
+	//刚读入的数据很有可能不会被替换，钉住防止替换
+	page_pool_[page_id].setPin(1);
+	page_pool_[page_id].setDirty(false);
+	page_pool_[page_id].setRefer(true);
+	//该Page有效
+	page_pool_[page_id].setValid(true);
+	return 1;
+}
 
 char* BufferManager::fetchPage(std::string file_name, int block_id)
 {
-	int page_id = fetchPageID();
+	int page_id = fetchPageID(file_name,block_id);
 	//如果不在缓冲池，就把它载入缓冲池
 	if(page_id == PAGENOTEXIST)
 	{
@@ -186,4 +261,5 @@ int BufferManager::offerPageID()
 			return i;
 		}
 	}
+	return -1;
 }

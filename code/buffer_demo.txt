@@ -1,0 +1,10 @@
+id                  int             
+emp_name            varchar
+sex                 enum
+age                 int
+hire_date           date
+post                varchar
+post_comment        varchar
+salary              double
+office              int
+depart_id           int
