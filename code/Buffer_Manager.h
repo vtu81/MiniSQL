@@ -14,26 +14,26 @@
 class Page 
 {
 private:
-    //ÓĞĞ§Î»
+    //æœ‰æ•ˆä½
     bool valid_;
-	//¿éºÅ
+	//å—å·
 	int block_id_;
-	//ÎÄ¼şÃû
+	//æ–‡ä»¶å
 	std::string file_name_;
-	//PageÄÚÈİ
+	//Pageå†…å®¹
 	char content_[PAGESIZE];
-	//pinµÄÊıÁ¿
+	//pinçš„æ•°é‡
 	int pin_;
-	//ÊÇ·ñÎªÔà¿é
+	//æ˜¯å¦ä¸ºè„å—
 	bool dirty_;
-	//ÓÃÓÚÌæ»»²ßÂÔ±äÁ¿
+	//ç”¨äºæ›¿æ¢ç­–ç•¥å˜é‡
 	bool reference_;
 public:
-	//Ä¬ÈÏ¹¹Ôìº¯Êı
+	//é»˜è®¤æ„é€ å‡½æ•°
 	Page();
-	//³õÊ¼»¯º¯Êı
+	//åˆå§‹åŒ–å‡½æ•°
 	void initialize();
-	// getºÍsetº¯Êı
+	// getå’Œsetå‡½æ•°
     void setValid(bool valid);
     bool getValid();
 
@@ -58,44 +58,44 @@ public:
 class BufferManager
 {
 public:
-    //Ä¬ÈÏ¹¹Ôìº¯Êı
+    //é»˜è®¤æ„é€ å‡½æ•°
     BufferManager()
     {
         initialize(MAXPAGEPOOLSIZE);
     }
-    //ÀûÓÃpage_num½øĞĞ¹¹Ôì
+    //åˆ©ç”¨page_numè¿›è¡Œæ„é€ 
     BufferManager(int page_num)
     {
         initialize(page_num);
     }
-    //Îö¹¹º¯Êı£¬outputËùÓĞÒ³
+    //ææ„å‡½æ•°ï¼Œoutputæ‰€æœ‰é¡µ
     ~BufferManager();
-    //·µ»Øfile_nameÎÄ¼şµÄblock_id¿éÔÚpage_pool_ÖĞµÄÊ×µØÖ·
+    //è¿”å›file_nameæ–‡ä»¶çš„block_idå—åœ¨page_pool_ä¸­çš„é¦–åœ°å€
     char* fetchPage(std::string file_name, int block_id);
-    //·µ»Øfile_nameÎÄ¼şµÄblock_id¿éÔÚpage_pool_ÖĞpageĞòºÅ
+    //è¿”å›file_nameæ–‡ä»¶çš„block_idå—åœ¨page_pool_ä¸­pageåºå·
     int fetchPageID(std::string file_name, int block_id);
-    //±ê¼ÇµÚpage_id¸öpageÎªdirty
+    //æ ‡è®°ç¬¬page_idä¸ªpageä¸ºdirty
     void markPageDirty(int page_id);
-    //¶¤×¡µÚpage_id¸öpage£ºpin_count++£»·µ»Ø¸Ä±äºóµÄpin_count
+    //é’‰ä½ç¬¬page_idä¸ªpageï¼špin_count++ï¼›è¿”å›æ”¹å˜åçš„pin_count
     int pinPage(int page_id);
-    //½â³ıµÚpage_id¸öpageµÄ¶¤×¡×´Ì¬£ºpin_count--£»·µ»Ø¸Ä±äºóµÄpin_count
+    //è§£é™¤ç¬¬page_idä¸ªpageçš„é’‰ä½çŠ¶æ€ï¼špin_count--ï¼›è¿”å›æ”¹å˜åçš„pin_count
     int unpinPage(int page_id);
-    //½«page_pool_ÖĞµÄµÚpage_id¸öpageĞ´µ½´ÅÅÌ£»·µ»Ø1±íÊ¾Êä³ö³É¹¦£¬·µ»Ø0±íÊ¾Êä³öÊ§°Ü
+    //å°†page_pool_ä¸­çš„ç¬¬page_idä¸ªpageå†™åˆ°ç£ç›˜ï¼›è¿”å›1è¡¨ç¤ºè¾“å‡ºæˆåŠŸï¼Œè¿”å›0è¡¨ç¤ºè¾“å‡ºå¤±è´¥
     int outputPage(int page_id);
     //int outputPage(int page_id, std::string file_name, int block_id);
 
 private:
-    //»º³å³ØÊ×µØÖ·Ö¸Õë
+    //ç¼“å†²æ± é¦–åœ°å€æŒ‡é’ˆ
     Page* page_pool_;
-    //»º³å³Ø´óĞ¡
+    //ç¼“å†²æ± å¤§å°
     int page_pool_size_;
-    //ĞèÒª½øĞĞÌæ»»µÄpageµÄidµÄÒ»¸öÖ¸Õë£¨ÔİÊ±²»ĞèÒª£¬ºóÃæ¿ÉÒÔ¿¼ÂÇÉ¾³ı¸Ãfield£©
+    //éœ€è¦è¿›è¡Œæ›¿æ¢çš„pageçš„idçš„ä¸€ä¸ªæŒ‡é’ˆï¼ˆæš‚æ—¶ä¸éœ€è¦ï¼Œåé¢å¯ä»¥è€ƒè™‘åˆ é™¤è¯¥fieldï¼‰
     // int replace_pointer_;
-    //³õÊ¼»¯º¯Êı£¬½öÔÚ¹¹Ôìº¯ÊıÖĞµ÷ÓÃ
+    //åˆå§‹åŒ–å‡½æ•°ï¼Œä»…åœ¨æ„é€ å‡½æ•°ä¸­è°ƒç”¨
     void initialize(int page_num);
-    //Ìá¹©£¨·µ»Ø£©Ò»¸ö¿ÉÒÔÓÃÓÚ´æ·ÅÊı¾İµÄpageµÄĞòºÅ
+    //æä¾›ï¼ˆè¿”å›ï¼‰ä¸€ä¸ªå¯ä»¥ç”¨äºå­˜æ”¾æ•°æ®çš„pageçš„åºå·
     int offerPageID();
-    //½«´ÅÅÌµÄfile_nameÎÄ¼şµÄblock_id¿éÔØÈë»º³å³ØµÄµÚpage_id¸öpageÖĞ£»ÔØÈë³É¹¦·µ»Ø1£¬ÔØÈëÊ§°Ü·µ»Ø0
+    //å°†ç£ç›˜çš„file_nameæ–‡ä»¶çš„block_idå—è½½å…¥ç¼“å†²æ± çš„ç¬¬page_idä¸ªpageä¸­ï¼›è½½å…¥æˆåŠŸè¿”å›1ï¼Œè½½å…¥å¤±è´¥è¿”å›0
     int loadDiskBlock2Page(int page_id, std::string file_name, int block_id);
 };
 

@@ -1,4 +1,4 @@
-#include "Buffer_Manager.h"
+ï»¿#include "Buffer_Manager.h"
 
  void BufferManager::initialize(int page_num)
 {
@@ -111,10 +111,10 @@ int BufferManager::pinPage(int page_id)
 int BufferManager::unpinPage(int page_id)
 {
 	int newpin = page_pool_[page_id].getPin() -1;
-	//Èç¹û±¾Éí´¦ÓÚpin×¡µÄ×´Ì¬
+	//å¦‚æœæœ¬èº«å¤„äºpinä½çš„çŠ¶æ€
 	if (newpin >= 0)    
 		page_pool_[page_id].setPin(newpin);
-	//Èç¹û±¾Éí´¦ÓÚÎ´pin×¡µÄ×´Ì¬
+	//å¦‚æœæœ¬èº«å¤„äºæœªpinä½çš„çŠ¶æ€
 	else page_pool_[page_id].setPin(0);
 	return page_pool_[page_id].getPin();
 }
@@ -123,7 +123,7 @@ int BufferManager::outputPage(int page_id)
 {
 	std::string filename = page_pool_[page_id].getFileName();
 	int blockid = page_pool_[page_id].getBlockID();
-	//Èô´ËPageÎªÓĞĞ§µÄPage£¬¼´ÄÚ²¿ÄÚÈİÓĞÒâÒå
+	//è‹¥æ­¤Pageä¸ºæœ‰æ•ˆçš„Pageï¼Œå³å†…éƒ¨å†…å®¹æœ‰æ„ä¹‰
 	if (page_pool_[page_id].getValid())
 	{
 		FILE* f = fopen(filename.c_str(), "r+");
@@ -134,9 +134,9 @@ int BufferManager::outputPage(int page_id)
 		}
 		fseek(f, PAGESIZE * blockid, SEEK_SET);
 		char* buffer = page_pool_[page_id].getBuffer();
-		// ½«ÄÚ´æÒ³µÄÄÚÈİĞ´Èë´ÅÅÌ¿é
+		// å°†å†…å­˜é¡µçš„å†…å®¹å†™å…¥ç£ç›˜å—
 		fwrite(buffer, PAGESIZE, 1, f);
-		// ¹Ø±ÕÎÄ¼ş
+		// å…³é—­æ–‡ä»¶
 		fclose(f);
 		return 1;
 	}
@@ -145,28 +145,28 @@ int BufferManager::outputPage(int page_id)
 
 int BufferManager::loadDiskBlock2Page(int page_id, std::string file_name, int block_id)
 {
-	// ´ò¿ª´ÅÅÌÎÄ¼ş
+	// æ‰“å¼€ç£ç›˜æ–‡ä»¶
 	FILE* f = fopen(file_name.c_str(), "r");
 	if (f == NULL)
 	{
 		std::cout << "File not exist!" << std::endl;
-		//Ê§°Ü·µ»Ø
+		//å¤±è´¥è¿”å›
 		return 0;                    
 	}
 	fseek(f, PAGESIZE * block_id, SEEK_SET);
 	char* buffer = page_pool_[page_id].getBuffer();
-	// ¶ÁÈ¡¶ÔÓ¦´ÅÅÌ¿éµ½ÄÚ´æÒ³
+	// è¯»å–å¯¹åº”ç£ç›˜å—åˆ°å†…å­˜é¡µ
 	fread(buffer, PAGESIZE, 1, f);
-	// ¹Ø±ÕÎÄ¼ş
+	// å…³é—­æ–‡ä»¶
 	fclose(f);
-	// ¶ÔĞÂÔØÈëµÄÒ³½øĞĞÏàÓ¦ÉèÖÃ
+	// å¯¹æ–°è½½å…¥çš„é¡µè¿›è¡Œç›¸åº”è®¾ç½®
 	page_pool_[page_id].setFileName(file_name);
 	page_pool_[page_id].setBlockID(block_id);
-	//¸Õ¶ÁÈëµÄÊı¾İºÜÓĞ¿ÉÄÜ²»»á±»Ìæ»»£¬¶¤×¡·ÀÖ¹Ìæ»»
+	//åˆšè¯»å…¥çš„æ•°æ®å¾ˆæœ‰å¯èƒ½ä¸ä¼šè¢«æ›¿æ¢ï¼Œé’‰ä½é˜²æ­¢æ›¿æ¢
 	page_pool_[page_id].setPin(1);
 	page_pool_[page_id].setDirty(false);
 	page_pool_[page_id].setRefer(true);
-	//¸ÃPageÓĞĞ§
+	//è¯¥Pageæœ‰æ•ˆ
 	page_pool_[page_id].setValid(true);
 	return 1;
 }
@@ -174,90 +174,90 @@ int BufferManager::loadDiskBlock2Page(int page_id, std::string file_name, int bl
 char* BufferManager::fetchPage(std::string file_name, int block_id)
 {
 	int page_id = fetchPageID(file_name,block_id);
-	//Èç¹û²»ÔÚ»º³å³Ø£¬¾Í°ÑËüÔØÈë»º³å³Ø
+	//å¦‚æœä¸åœ¨ç¼“å†²æ± ï¼Œå°±æŠŠå®ƒè½½å…¥ç¼“å†²æ± 
 	if(page_id == PAGENOTEXIST)
 	{
 		page_id = offerPageID();
 		loadDiskBlock2Page(page_id, file_name, block_id);
 	}
-	page_pool_[page_id].setRefer(true); //±ê¼ÇÒıÓÃ£¬Ìæ»»²ßÂÔ»á½øÒ»²½Ê¹ÓÃReferenceÊôĞÔ
-	return page_pool_[page_id].getBuffer(); //·µ»ØÊ×µØÖ·
+	page_pool_[page_id].setRefer(true); //æ ‡è®°å¼•ç”¨ï¼Œæ›¿æ¢ç­–ç•¥ä¼šè¿›ä¸€æ­¥ä½¿ç”¨Referenceå±æ€§
+	return page_pool_[page_id].getBuffer(); //è¿”å›é¦–åœ°å€
 }
 
 int BufferManager::fetchPageID(std::string file_name, int block_id)
 {
-	//±éÀú»º³å³ØÑ°ÕÒ¶ÔÓ¦µÄpage
+	//éå†ç¼“å†²æ± å¯»æ‰¾å¯¹åº”çš„page
 	for(int i = 0; i < page_pool_size_; i++)
 	{
 		if(page_pool_[i].getValid()\
 		&& page_pool_[i].getFileName() == file_name\
 		&& page_pool_[i].getBlockID() == block_id)
 		{
-			//ÕÒµ½ÁË£¡
+			//æ‰¾åˆ°äº†ï¼
 			return i;
 		}
 	}
-	//·ñÔò·µ»ØPAGENOTEXIST
+	//å¦åˆ™è¿”å›PAGENOTEXIST
 	return PAGENOTEXIST;
 }
 
 int BufferManager::offerPageID()
 {
 	int backupPageID = -1;
-	//±éÀú»º³å³ØÑ°ÕÒ¿ÕÏĞµÄpage
+	//éå†ç¼“å†²æ± å¯»æ‰¾ç©ºé—²çš„page
 	for(int i = 0; i < page_pool_size_; i++)
 	{
 		if(!page_pool_[i].getValid())
 		{
-			//ÕÒµ½ÁËÃ»±»Õ¼ÓÃµÄpage
+			//æ‰¾åˆ°äº†æ²¡è¢«å ç”¨çš„page
 			return i;
 		}
 		else if(!page_pool_[i].getDirty() && !page_pool_[i].getRefer())
 		{
-			//Ê±ÖÓÖÃ»»µÄµÚÒ»´Î±éÀú£¨Í¬Ê±½øĞĞ£©
-			//·ñÔò¶ÔÓÚÃ¿¸ö±»Õ¼ÓÃµÄpage£¬Èç¹ûdirty_¡¢reference_¶¼Îªfalse
-			//¾ÍÏÈ±£´æÏÂÀ´£¬ÈÕºó¿ÉÄÜÓÃµ½
+			//æ—¶é’Ÿç½®æ¢çš„ç¬¬ä¸€æ¬¡éå†ï¼ˆåŒæ—¶è¿›è¡Œï¼‰
+			//å¦åˆ™å¯¹äºæ¯ä¸ªè¢«å ç”¨çš„pageï¼Œå¦‚æœdirty_ã€reference_éƒ½ä¸ºfalse
+			//å°±å…ˆä¿å­˜ä¸‹æ¥ï¼Œæ—¥åå¯èƒ½ç”¨åˆ°
 			backupPageID = i;
 		}
 	}
-	//·ñÔòÃ¿¸öpage¶¼ÊÇvalidµÄ£¬ĞèÒªÌæ»»Ò»¸öpage³öÈ¥
-	//²ÉÓÃÊ±ÖÓÖÃ»»¡£¾ßÌå²½ÖèÈçÏÂ£º
-	//µÚÒ»´Îµ¥Ïò±éÀú£ºÑ°ÕÒdirty_¡¢reference_¶¼ÎªfalseµÄpage£¨ÔÚÇ°ÃæÒÑ¾­Ë³±ãÍê³ÉÁË£©
+	//å¦åˆ™æ¯ä¸ªpageéƒ½æ˜¯validçš„ï¼Œéœ€è¦æ›¿æ¢ä¸€ä¸ªpageå‡ºå»
+	//é‡‡ç”¨æ—¶é’Ÿç½®æ¢ã€‚å…·ä½“æ­¥éª¤å¦‚ä¸‹ï¼š
+	//ç¬¬ä¸€æ¬¡å•å‘éå†ï¼šå¯»æ‰¾dirty_ã€reference_éƒ½ä¸ºfalseçš„pageï¼ˆåœ¨å‰é¢å·²ç»é¡ºä¾¿å®Œæˆäº†ï¼‰
 	if(backupPageID != -1)
 	{
 		return backupPageID;
 	}
-	//Èç¹ûÃ»ÓĞÕÒµ½ÔÙ½øĞĞµÚ¶ş´Îµ¥Ïò±éÀú£º
-	//½«±éÀúµÄpageµÄreference_ÖÃÎª0£¬Ñ°ÕÒµ½µÚÒ»¸öreference_=0µÄpage£¨ÏÂÃæÊÇµÚ¶ş´Î±éÀú£©
+	//å¦‚æœæ²¡æœ‰æ‰¾åˆ°å†è¿›è¡Œç¬¬äºŒæ¬¡å•å‘éå†ï¼š
+	//å°†éå†çš„pageçš„reference_ç½®ä¸º0ï¼Œå¯»æ‰¾åˆ°ç¬¬ä¸€ä¸ªreference_=0çš„pageï¼ˆä¸‹é¢æ˜¯ç¬¬äºŒæ¬¡éå†ï¼‰
 	for(int i = 0; i < page_pool_size_; i++)
 	{
 		if(!page_pool_[i].getRefer())
 		{
-			//¸ÃpageµÄreference_=0£¬OK
+			//è¯¥pageçš„reference_=0ï¼ŒOK
 			return i;
 		}
-		page_pool_[i].setRefer(false); //ÖÃÎª0
+		page_pool_[i].setRefer(false); //ç½®ä¸º0
 	}
-	//Èç¹û»¹ÊÇÃ»ÓĞÕÒµ½·ûºÏÒªÇóµÄpage
-	//µÚÈı´Îµ¥Ïò±éÀú£ºÑ°ÕÒdirty_¡¢reference_¶¼ÎªfalseµÄpage£¨ºÍµÚÒ»´ÎÒ»Ñù£©
+	//å¦‚æœè¿˜æ˜¯æ²¡æœ‰æ‰¾åˆ°ç¬¦åˆè¦æ±‚çš„page
+	//ç¬¬ä¸‰æ¬¡å•å‘éå†ï¼šå¯»æ‰¾dirty_ã€reference_éƒ½ä¸ºfalseçš„pageï¼ˆå’Œç¬¬ä¸€æ¬¡ä¸€æ ·ï¼‰
 	for(int i = 0; i < page_pool_size_; i++)
 	{
 		if(!page_pool_[i].getDirty() && !page_pool_[i].getRefer())
 		{
-			//Ê±ÖÓÖÃ»»µÄµÚÈı´Î±éÀú
-			//¶ÔÓÚÃ¿¸ö±»Õ¼ÓÃµÄpage£¬Èç¹ûdirty_¡¢reference_¶¼Îªfalse
-			//Ö±½Ó·µ»Ø
+			//æ—¶é’Ÿç½®æ¢çš„ç¬¬ä¸‰æ¬¡éå†
+			//å¯¹äºæ¯ä¸ªè¢«å ç”¨çš„pageï¼Œå¦‚æœdirty_ã€reference_éƒ½ä¸ºfalse
+			//ç›´æ¥è¿”å›
 			return i;
 		}
 	}
-	//Èç¹û»¹ÊÇÃ»ÓĞÕÒµ½·ûºÏÒªÇóµÄpage
-	//µÚËÄ´Îµ¥Ïò±éÀú£ºÑ°ÕÒµ½µÚÒ»¸öreference_=0µÄpage£¨ºÍµÚ¶ş´ÎÏàËÆ£©
-	//ÕâÒ²ÊÇ×îºóÒ»´Î±éÀúÁË--±ØÈ»ÄÜÕÒµ½
+	//å¦‚æœè¿˜æ˜¯æ²¡æœ‰æ‰¾åˆ°ç¬¦åˆè¦æ±‚çš„page
+	//ç¬¬å››æ¬¡å•å‘éå†ï¼šå¯»æ‰¾åˆ°ç¬¬ä¸€ä¸ªreference_=0çš„pageï¼ˆå’Œç¬¬äºŒæ¬¡ç›¸ä¼¼ï¼‰
+	//è¿™ä¹Ÿæ˜¯æœ€åä¸€æ¬¡éå†äº†--å¿…ç„¶èƒ½æ‰¾åˆ°
 	for(int i = 0; i < page_pool_size_; i++)
 	{
 		if(!page_pool_[i].getRefer())
 		{
-			//¸ÃpageµÄreference_=0£¬OK
+			//è¯¥pageçš„reference_=0ï¼ŒOK
 			return i;
 		}
 	}
