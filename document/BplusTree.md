@@ -12,12 +12,12 @@ BpTree<int, double>* tree = new BpTree<int, double>();
 
 ```c++
 /**
- * @param searchKey: 搜索码
- * @param pos: 如果码已经存在，则为码的位置，否则为大于该搜索码的最小码的位置
- * @return bool: 是否存在
- */
+* @param searchKey: 搜索码
+* @param value: 如果找到，*value赋值为对应的储存值
+* @return: 如果不存在，返回大于搜索码的最小键值所在结点（可以认为nullptr的搜索码为正无穷），否则返回该key所在的叶结点
+*/
 template <class Key, class Value>
-bool BpNode<Key, Value>::search(const Key &searchKey, int &pos);
+BpNode<Key, Value>* BpTree<Key, Value>::search(const Key &searchKey, Value* value)
 ```
 
 【2】范围查询

@@ -12,14 +12,13 @@ void test_BpTree_main(); // used for debug
 template <class Key, class Value>
 class BpTree; // 提前声明B+树类
 
-const int degree = 3; // 一个结点包含key值的最大数量
 template <class Key, class Value>
 class BpNode
 {
 public: // 把B+树类指定为结点的友元类，允许其访问私有成员
     friend class BpTree<Key, Value>;
 public:
-    BpNode();
+    BpNode(int degree);
     bool isRoot();
     bool isLeaf();
     bool isFull();
@@ -35,13 +34,14 @@ private:
     BpNode<Key, Value>* rightNode;
     std::vector<BpNode<Key, Value>*> kids;
     BpNode<Key, Value>* parent;
+    int degree; // 一个结点包含key值的最大数量
 };
 
 template <class Key, class Value>
 class BpTree
 {
 public:
-    BpTree();
+    BpTree(int degree);
     ~BpTree();
     BpNode<Key, Value>* search(const Key& searchKey, Value* value);
     BpNode<Key, Value>* search(const Key& searchKey);
@@ -54,14 +54,15 @@ private:
     BpNode<Key, Value>* minNode; // 最左端的叶节点
     int height; // B+树高度
     int count; // 结点个数
+    int degree; // 一个结点包含key值的最大数量
 private:
     bool delete_entry(BpNode<Key, Value>* node, const Key& key);
 };
 
 
 template <class Key, class Value>
-BpNode<Key, Value>::BpNode()
-: count(0), parent(nullptr), rightNode(nullptr), kids(), keys(), values()
+BpNode<Key, Value>::BpNode(int degree)
+: count(0), parent(nullptr), rightNode(nullptr), kids(), keys(), values(), degree(degree)
 {
     for (int i = 0; i <= degree; ++i)
     { // 理论上key与value的大小应该为"degree"，
@@ -157,7 +158,7 @@ template <class Key, class Value>
 BpNode<Key, Value>* BpNode<Key, Value>::split(Key &promoted)
 {
     int leftSize = (count / 2); // 分裂后原节点的大小
-    BpNode<Key, Value>* right = new BpNode<Key, Value>(); // 分裂新增的右节点
+    BpNode<Key, Value>* right = new BpNode<Key, Value>(degree); // 分裂新增的右节点
     promoted = this->keys[leftSize];
 
     right->parent = this->parent; // 分裂节点具有相同的父节点
@@ -242,14 +243,15 @@ bool BpNode<Key, Value>::insert(const Key &key, Value* const value)
 }
 
 template <class Key, class Value>
-BpTree<Key, Value>::BpTree()
-: count(0), root(nullptr), minNode(nullptr), height(0){}
+BpTree<Key, Value>::BpTree(int degree)
+: count(0), root(nullptr), minNode(nullptr), height(0), degree(degree){}
+
 
 /**
- * @param searchKey: 搜索码
- * @param value: 如果找到，value赋值为对应的指针
- * @return: 如果不存在，返回"nullptr"，否则返回该key所在的叶结点
- */
+* @param searchKey: 搜索码
+* @param value: 如果找到，value赋值为对应的指针
+* @return: 如果不存在，返回大于搜索码的最小键值所在结点（可以认为nullptr的搜索码为正无穷），否则返回该key所在的叶结点
+*/
 template <class Key, class Value>
 BpNode<Key, Value>* BpTree<Key, Value>::search(const Key &searchKey, Value* value)
 {
@@ -271,20 +273,27 @@ BpNode<Key, Value>* BpTree<Key, Value>::search(const Key &searchKey, Value* valu
     // 现在node为某一叶节点
     if (node->search(searchKey, pos))
     { // 找到该搜索码
-        value = node->values[pos];
+        if (node->values[pos] != nullptr)
+        { // 存在储存值
+            if (value == nullptr)
+            { // 指针没有分配内存
+                value = new Value();
+            }
+            *value = *(node->values[pos]);
+        }
         return node;
     }
     else
     {
         value = nullptr;
-        return nullptr;
+        return node;
     }
 }
 
 /**
  * @param searchKey: 搜索码
  * @param value: 如果找到，value赋值为对应的指针
- * @return: 如果不存在，返回"nullptr"，否则返回该key所在的叶结点
+ * @return: 如果不存在，返回大于搜索码的最小键值所在结点（可以认为nullptr的搜索码为正无穷），否则返回该key所在的叶结点
  */
 template <class Key, class Value>
 BpNode<Key, Value>* BpTree<Key, Value>::search(const Key &searchKey)
@@ -303,7 +312,7 @@ bool BpTree<Key, Value>::insert(const Key &key, Value *const value)
 {
     if (root == nullptr)
     {
-        root = new BpNode<Key, Value>();
+        root = new BpNode<Key, Value>(degree);
         root->insert(key, value);
         count++;
         minNode = root;
@@ -342,7 +351,7 @@ bool BpTree<Key, Value>::insert(const Key &key, Value *const value)
             if (node->isRoot())
             { // 根结点
                 height++;
-                BpNode<Key, Value>* newRoot = new BpNode<Key, Value>();
+                BpNode<Key, Value>* newRoot = new BpNode<Key, Value>(degree);
                 this->root = newRoot;
                 node->rightNode->parent = node->parent = root;
                 root->insert(promoted);
@@ -372,7 +381,8 @@ template <class Key, class Value>
 bool BpTree<Key, Value>::delete_single(const Key &key)
 {
     BpNode<Key, Value>* node = this->search(key);
-    if (node == nullptr)
+    int temp = 0;
+    if (!node->search(key, temp))
     { // 没有找到对应的key
         return false;
     }
@@ -596,7 +606,7 @@ bool BpTree<Key, Value>::search_range(const Key &min, const Key &max, std::vecto
     int pos = 0;
 
     for ( pos = pos_min + !minEq, node = node_min;
-          !(node == node_max && pos + !maxEq == pos_max);
+          !(node == node_max && pos + !maxEq >= pos_max);
           ++pos
         )
     {
