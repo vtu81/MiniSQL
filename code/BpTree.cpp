@@ -10,9 +10,9 @@ void test_BpTree_main()
 {
     std::srand(time(nullptr));
     std::set<int> set;
-    BpTree<int, int>* tree = new BpTree<int, int>();
+    BpTree<int, int>* tree = new BpTree<int, int>(3);
     int length = rand() % 1000000;
-    int delete_num = rand() % 10000;
+    int delete_num = rand() % 100000;
     for (int i = 0;i < length; ++i)
     {
         set.insert(i);
@@ -32,12 +32,13 @@ void test_BpTree_main()
     /* (2)范围删除 */
     int min = length / 3;
     int max = length / 2;
+
     bool minEq = true;
     bool maxEq = true;
     // 1. 删除集合中元素
     for (int i = min + !minEq; i <= max - !maxEq; ++i)
     {
-        set.erase(i);
+        i == set.erase(i);
     }
     // 2. 范围删除B+树中元素
     tree->delete_range(min, max, minEq, maxEq);
