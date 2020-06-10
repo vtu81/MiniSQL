@@ -3,7 +3,7 @@
 #define _BUFFER_MANAGER_H_
 #define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
-#include<stdio.h>
+#include <stdio.h>
 #include <cstdio>
 #include <string>
 

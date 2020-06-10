@@ -3,21 +3,21 @@ using namespace std;
 
 int main()
 {
-	//³õÊ¼»¯Ò»¸ö¶ÔÏó£¬¿ÉÒÔÉèÖÃpage_pool_sizeµÄÖµ
+	//åˆå§‹åŒ–ä¸€ä¸ªå¯¹è±¡ï¼Œå¯ä»¥è®¾ç½®page_pool_sizeçš„å€¼
 	BufferManager B;
-	//±íÊ¾´Óbuffer_demo.txtÎÄ¼şÖĞ£¬¶ÁÈëµÚÒ»¸ö¿é
+	//è¡¨ç¤ºä»buffer_demo.txtæ–‡ä»¶ä¸­ï¼Œè¯»å…¥ç¬¬ä¸€ä¸ªå—
 	char *s = B.fetchPage("buffer_demo.txt", 0);
-	//·µ»ØbufferÖĞµÄÎ»ÖÃ
+	//è¿”å›bufferä¸­çš„ä½ç½®
 	int a= B.fetchPageID("buffer_demo.txt", 0);
 	cout << s << endl<<a;
 	s[0] = 'I';
 	s[1] = 'D';
-	//Ğ´»ØÔ­ÎÄ¼ş
+	//å†™å›åŸæ–‡ä»¶
 	B.outputPage(0);
 	return 0;
 }
 /*
-Ô­buffer_demoÎÄ¼ş£º
+åŸbuffer_demoæ–‡ä»¶ï¼š
 id                  int
 emp_name            varchar
 sex                 enum
