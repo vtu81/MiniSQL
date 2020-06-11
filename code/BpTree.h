@@ -6,8 +6,23 @@
 #define BPLUSTREE_BPTREE_H
 #include <iostream>
 #include <vector>
+#include <string.h>
+#include "Buffer_Manager.h"
+
+//可能要修改；这个buffer manager可能来自高层模块/全局共用
+//暂时定义为一个静态全局变量，方便调试
+//To be continued
+static BufferManager bm;
 
 void test_BpTree_main(); // used for debug
+//将对象本身的二进制数据存入内存
+template <typename T> void copyData2Mem(char* mem_addr, T& data, int data_size);
+//存string对象至内存（string类需要特殊处理，实际上转换成了若干个char）
+void copyData2Mem(char* mem_addr, std::string& data, int data_size);
+//从内存读取对象的二进制数据，重构data
+template <typename T> void readDataFromMem(char* mem_addr, T& data, int data_size);
+//从内存取string对象至data
+void readDataFromMem(char* mem_addr, std::string& data, int data_size);
 
 template <class Key, class Value>
 class BpTree; // 提前声明B+树类
@@ -41,7 +56,7 @@ template <class Key, class Value>
 class BpTree
 {
 public:
-    BpTree(int degree);
+    BpTree(std::string file_name, int key_size, int degree);
     ~BpTree();
     BpNode<Key, Value>* search(const Key& searchKey, Value* value);
     BpNode<Key, Value>* search(const Key& searchKey);
@@ -49,14 +64,20 @@ public:
     bool insert(const Key& key, Value* const value);
     bool delete_single(const Key& key);
     bool delete_range(const Key& min, const Key& max, bool minEq = true, bool maxEq = true);
+    void write_back_to_disk_all();
+    void read_from_disk_all();
 private:
     BpNode<Key, Value>* root; // B+树的根结点
     BpNode<Key, Value>* minNode; // 最左端的叶节点
     int height; // B+树高度
     int count; // 结点个数
     int degree; // 一个结点包含key值的最大数量
+    std::string file_name; //对应的索引文件名
+    int key_size; //键的大小：int、float直接取sizeof()l；string类为字符串的长度
 private:
     bool delete_entry(BpNode<Key, Value>* node, const Key& key);
+    int init_file(std::string file_path);
+    int get_block_num(std::string file_path);
 };
 
 
@@ -243,8 +264,17 @@ bool BpNode<Key, Value>::insert(const Key &key, Value* const value)
 }
 
 template <class Key, class Value>
-BpTree<Key, Value>::BpTree(int degree)
-: count(0), root(nullptr), minNode(nullptr), height(0), degree(degree){}
+BpTree<Key, Value>::BpTree(std::string file_name, int key_size, int degree)
+: count(0), root(nullptr), minNode(nullptr), height(0), degree(degree), key_size(key_size), file_name(file_name)
+{
+    read_from_disk_all();
+}
+
+template <class Key, class Value>
+BpTree<Key, Value>::~BpTree()
+{
+    //释放内存？
+}
 
 
 /**
@@ -655,6 +685,142 @@ bool BpTree<Key, Value>::delete_range(const Key &min, const Key &max, bool minEq
     { // 没有符合要求的待删除元素
         return false;
     }
+}
+
+template <class Key, class Value>
+void BpTree<Key, Value>::read_from_disk_all()
+{
+    std::cout<<"Read from disk:"<<std::endl;
+    std::string file_path = "./database/index/" + file_name;
+    
+    if(!init_file(file_path)) return; //如果没有这个文件，就直接返回
+    std::cout<<"hi"<<std::endl;
+    //否则需要读取该文件
+    int block_num = get_block_num(file_path);
+    for (int i = 0; i < block_num; i++)
+    {
+        char* page_start = bm.fetchPage(file_path, i);
+        int offset = 0;
+        while(offset < PAGESIZE && page_start[offset] != '#')
+        {
+            Key key;
+            Value value;
+            readDataFromMem(page_start + offset, key, key_size);
+            offset += key_size;
+            readDataFromMem(page_start + offset, value, sizeof(value));
+            offset += sizeof(value);
+
+            //Output for debug.
+            //还没有将(key, value)插入树中，待下一个版本再补充
+            //To be continued.
+            std::cout << "key: " << key << ", value: " << value << std::endl;
+        }
+    }
+}
+
+template <class Key, class Value>
+void BpTree<Key, Value>::write_back_to_disk_all()
+{
+    std::string file_path = "./database/index/" + file_name;
+    // std::cout<<"file path: "<<file_path<<std::endl;
+    init_file(file_path);
+    // int block_num = get_block_num(file_path);
+
+    int i, j;
+    BpNode<Key, Value>* leaf_tmp = minNode;
+    for (j = 0, i = 0; leaf_tmp != nullptr; j++)
+    {
+        std::cout<<"Hello!"<<std::endl;
+        int offset = 0; //块内扫描地址偏移
+        char* page_start = bm.fetchPage(file_path, j);
+        memset(page_start, 0, PAGESIZE); //清空缓冲页
+        for(i = 0; i < leaf_tmp->count; i++)
+        {
+            //读入一个key
+            copyData2Mem(page_start + offset, leaf_tmp->keys[i], key_size);
+            offset += key_size;
+            //读入一个value（注意：value中存的是指针）
+            //To be continued.
+            copyData2Mem(page_start + offset, *(leaf_tmp->values[i]), sizeof(Value));
+            std::cout<<"# "<<*(leaf_tmp->values[i])<<std::endl;
+            offset += sizeof(Value);
+        }
+        //块内结束标志'#'
+        page_start[offset++] = '#';
+        //标记该page为dirty
+        int page_id = bm.fetchPageID(file_path, j);
+        bm.markPageDirty(page_id);
+        //Output for debug.
+        if(offset > PAGESIZE) std::cout<<"BpTree node too big! A single page cannot hold it."<<std::endl; //for debug
+        leaf_tmp = leaf_tmp->rightNode;
+    }
+    //结束块，首字节也为'#'
+    char* page_start = bm.fetchPage(file_path, j);
+    memset(page_start, 0, PAGESIZE); //清空缓冲页
+    page_start[0] = '#';
+    int page_id = bm.fetchPageID(file_path, j);
+    bm.markPageDirty(page_id);
+}
+
+//初始化文件
+template <class Key, class Value>
+int BpTree<Key, Value>::init_file(std::string file_path)
+{
+    FILE* f = fopen(file_path.c_str() , "r");
+    if (f == NULL) {
+        //不存在这个文件，创建它
+        f = fopen(file_path.c_str(), "w+");
+        fclose(f);
+        f = fopen(file_path.c_str() , "r");
+        fclose(f);
+        return 0;
+    }
+    //否则确实存在这个文件
+    fclose(f);
+    return 1;
+}
+
+//获取索引文件的块数
+template <class Key, class Value>
+int BpTree<Key, Value>::get_block_num(std::string file_path)
+{
+    char* tmp;
+    int block_num = 0;
+    tmp = bm.fetchPage(file_path, block_num);
+    while(tmp[0] != '#')
+    {
+        block_num++;
+        tmp = bm.fetchPage(file_path , block_num);
+        if(block_num > MAXPAGEPOOLSIZE) return -1; //不是一个符合规范的索引文件
+    } 
+    return block_num;
+}
+
+//将对象本身的二进制数据存入内存
+template <typename T>
+void copyData2Mem(char* mem_addr, T& data, int data_size)
+{
+    char* data_addr = (char*)&(data);
+    memcpy(mem_addr, data_addr, data_size);
+}
+
+//存string对象至内存（string类需要特殊处理，实际上转换成了若干个char）
+void copyData2Mem(char* mem_addr, std::string& data, int data_size)
+{
+    memcpy(mem_addr, data.c_str(), data.length());
+}
+
+//从内存读取对象的二进制数据，重构data
+template <typename T>
+void readDataFromMem(char* mem_addr, T& data, int data_size)
+{
+    data = *(T*)mem_addr;
+}
+
+//从内存取string对象至data
+void readDataFromMem(char* mem_addr, std::string& data, int data_size)
+{
+    data = std::string(mem_addr, data_size);
 }
 
 #endif //BPLUSTREE_BPTREE_H
