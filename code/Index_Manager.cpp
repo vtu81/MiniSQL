@@ -148,7 +148,9 @@ int IndexManager::searchIndex(std::string file_name, std::string key, int type)
             std::cout << "Error: No index " << file_name << " exists!" << std::endl;
             return -1;
         }
-        return i->second->search(key_float);
+        int ret_float;
+        i->second->search(key_float, &ret_float);
+        return ret_float; 
     }
     else if(type == TYPE_INT)
     {
@@ -158,7 +160,9 @@ int IndexManager::searchIndex(std::string file_name, std::string key, int type)
             std::cout << "Error: No index " << file_name << " exists!" << std::endl;
             return -1;
         }
-        return i->second->search(key_int);
+        int ret_int;
+        i->second->search(key_float, &ret_int);
+        return ret_int; 
     }
     else
     {
@@ -168,7 +172,9 @@ int IndexManager::searchIndex(std::string file_name, std::string key, int type)
             std::cout << "Error: No index " << file_name << " exists!" << std::endl;
             return -1;
         }
-        return i->second->search(key_string);
+        int ret_string;
+        i->second->search(key_string, &ret_string);
+        return ret_string; 
     }
     
 }
