@@ -7,6 +7,8 @@
 #include "API.h"
 #include <map>
 #include <vector>
+#include <sstream>
+#include <string>
 
 
 class IndexManager
@@ -65,9 +67,10 @@ public:
 
     //插入单条索引
     //@file_name：索引文件名（由record manager中的函数生成并传入）
+    //@key：索引键值
     //@blockID: 索引对应记录所在磁盘文件的block编号（注意，该处文件指磁盘中的记录文件，而非索引文件）
     //@type: 索引的类型
-    void insertIndex(std::string file_name, int blockID, int type);
+    void insertIndex(std::string file_name, std::string key, int blockID, int type);
 
     //根据传入键值删除单条索引
     //@file_name：索引文件名（由record manager中的函数生成并传入）
