@@ -7,22 +7,28 @@
 #include <iostream>
 #include <vector>
 #include <string.h>
+#include "Exception.h"
 #include "Buffer_Manager.h"
 
-//可能要修改；这个buffer manager可能来自高层模块/全局共用
-//暂时定义为一个静态全局变量，方便调试
-//To be continued
+// 可能要修改；这个buffer manager可能来自高层模块/全局共用
+// 暂时定义为一个静态全局变量，方便调试
+// To be continued
 static BufferManager bm;
 
 void test_BpTree_main(); // used for debug
-//将对象本身的二进制数据存入内存
-template <typename T> void copyData2Mem(char* mem_addr, T& data, int data_size);
-//存string对象至内存（string类需要特殊处理，实际上转换成了若干个char）
-void copyData2Mem(char* mem_addr, std::string& data, int data_size);
-//从内存读取对象的二进制数据，重构data
-template <typename T> void readDataFromMem(char* mem_addr, T& data, int data_size);
-//从内存取string对象至data
-void readDataFromMem(char* mem_addr, std::string& data, int data_size);
+
+
+// 将对象本身的二进制数据存入内存
+template <typename T>
+static void copyData2Mem(char* mem_addr, T& data, int data_size);
+
+// 存string对象至内存（string类需要特殊处理，实际上转换成了若干个char）
+static void copyData2Mem(char* mem_addr, std::string& data, int data_size);
+// 从内存读取对象的二进制数据，重构data
+template <typename T>
+static void readDataFromMem(char* mem_addr, T& data, int data_size);
+// 从内存取string对象至data
+static void readDataFromMem(char* mem_addr, std::string& data, int data_size);
 
 template <class Key, class Value>
 class BpTree; // 提前声明B+树类
@@ -40,12 +46,12 @@ public:
     ~BpNode();
     bool search(const Key& searchKey, int& pos); // 如果码已经存在，则为码的位置，否则为大于该搜索码的最小码的位置
     BpNode<Key, Value>* split(Key& promoted); // key promoted to upper layer
-    bool insert(const Key& key, Value* const value = nullptr); // 插入key值，返回是否插入成功（已存在时无法插入）
+    bool insert(const Key& key, const Value value = Value()); // 插入key值，返回是否插入成功（已存在时无法插入）
     bool remove(const int& pos); // 删除对应位置的key与value
 private:
-    std::vector<Key> keys; //
-    std::vector<Value*> values; //
-    int count; // number of keys in the node
+    std::vector<Key> keys; // 搜索码
+    std::vector<Value> values; // 储存值
+    int count; // 该结点Key的数目
     BpNode<Key, Value>* rightNode;
     std::vector<BpNode<Key, Value>*> kids;
     BpNode<Key, Value>* parent;
@@ -58,10 +64,10 @@ class BpTree
 public:
     BpTree(std::string file_name, int key_size, int degree);
     ~BpTree();
-    BpNode<Key, Value>* search(const Key& searchKey, Value* value);
+    BpNode<Key, Value>* search(const Key& searchKey, Value& value);
     BpNode<Key, Value>* search(const Key& searchKey);
-    bool search_range(const Key& min, const Key& max, std::vector<Key>* keys, std::vector<Value*>* values, bool minEq = true, bool maxEq = true);
-    bool insert(const Key& key, Value* const value);
+    bool search_range(const Key& min, const Key& max, std::vector<Key>* keys, std::vector<Value>* values, bool minEq = true, bool maxEq = true);
+    bool insert(const Key& key, const Value value = Value());
     bool delete_single(const Key& key);
     bool delete_range(const Key& min, const Key& max, bool minEq = true, bool maxEq = true);
     void write_back_to_disk_all();
@@ -78,19 +84,20 @@ private:
     bool delete_entry(BpNode<Key, Value>* node, const Key& key);
     int init_file(std::string file_path);
     int get_block_num(std::string file_path);
+    void free_entry(BpNode<Key, Value>* root);
 };
 
 
 template <class Key, class Value>
 BpNode<Key, Value>::BpNode(int degree)
-: count(0), parent(nullptr), rightNode(nullptr), kids(), keys(), values(), degree(degree)
+        : count(0), parent(nullptr), rightNode(nullptr), kids(), keys(), values(), degree(degree)
 {
     for (int i = 0; i <= degree; ++i)
     { // 理论上key与value的大小应该为"degree"，
-      // 但是为了方便处理，允许结点满时暂时超出阈值大小，所以所有数组数据的大小+1
+        // 但是为了方便处理，允许结点满时暂时超出阈值大小，所以所有数组数据的大小+1
         kids.push_back(nullptr);
         keys.push_back(Key());
-        values.push_back(nullptr);
+        values.push_back(Value());
     }
 
     kids.push_back(nullptr);
@@ -100,7 +107,10 @@ BpNode<Key, Value>::BpNode(int degree)
 template <class Key, class Value>
 BpNode<Key, Value>::~BpNode()
 {
-
+    std::vector<Key>(keys).swap(values); // 释放键值内存
+    std::vector<Value>(values).swap(values); // 释放储存值内存
+    std::vector<BpNode<Key, Value>*>(kids).swap(kids); // 释放孩子指针内存
+    rightNode = parent = nullptr;
 }
 
 template <class Key, class Value>
@@ -175,6 +185,12 @@ bool BpNode<Key, Value>::search(const Key &searchKey, int &pos)
     return false;
 }
 
+
+/**
+ * @param promoted: 分裂结点后，需要插入上一层的键值
+ * @return: 分裂后左边的结点
+ */
+
 template <class Key, class Value>
 BpNode<Key, Value>* BpNode<Key, Value>::split(Key &promoted)
 {
@@ -196,7 +212,7 @@ BpNode<Key, Value>* BpNode<Key, Value>::split(Key &promoted)
             right->values[i - leftSize] = this->values[i];
             // 清除原节点对应的key与value
             this->keys[i] = Key();
-            this->values[i] = nullptr;
+            this->values[i] = Value();
         }
         // 更新节点计数
         right->count = count - leftSize;
@@ -211,11 +227,11 @@ BpNode<Key, Value>* BpNode<Key, Value>::split(Key &promoted)
             right->values[i - leftSize - 1] = this->values[i];
             // 清除原节点对应的key与value
             this->keys[i] = Key();
-            this->values[i] = nullptr;
+            this->values[i] = Value();
         }
         // "promoted"被插入高层后不再在这一层出现
         this->keys[leftSize] = Key();
-        this->values[leftSize] = nullptr;
+        this->values[leftSize] = Value();
 
         for (int i = leftSize+1; i <= count; ++i)
         {   // 右半边孩子也要进行转移
@@ -231,7 +247,7 @@ BpNode<Key, Value>* BpNode<Key, Value>::split(Key &promoted)
 }
 
 template <class Key, class Value>
-bool BpNode<Key, Value>::insert(const Key &key, Value* const value)
+bool BpNode<Key, Value>::insert(const Key &key, const Value value)
 {
     int pos = 0;
     if (this->search(key, pos))
@@ -265,25 +281,30 @@ bool BpNode<Key, Value>::insert(const Key &key, Value* const value)
 
 template <class Key, class Value>
 BpTree<Key, Value>::BpTree(std::string file_name, int key_size, int degree)
-: count(0), root(nullptr), minNode(nullptr), height(0), degree(degree), key_size(key_size), file_name(file_name)
+        : count(0), root(nullptr), minNode(nullptr), height(0), degree(degree), key_size(key_size), file_name(file_name)
 {
-    read_from_disk_all();
+    read_from_disk_all(); // 测试时注释掉
 }
 
 template <class Key, class Value>
 BpTree<Key, Value>::~BpTree()
 {
-    //释放内存？
+    if (root != nullptr)
+    { // B+树非空
+        free_entry(root);
+        root = nullptr;
+        minNode = nullptr;
+    }
 }
 
 
 /**
 * @param searchKey: 搜索码
-* @param value: 如果找到，value赋值为对应的指针
+* @param value: 如果找到，value赋值为对应的值
 * @return: 如果不存在，返回大于搜索码的最小键值所在结点（可以认为nullptr的搜索码为正无穷），否则返回该key所在的叶结点
 */
 template <class Key, class Value>
-BpNode<Key, Value>* BpTree<Key, Value>::search(const Key &searchKey, Value* value)
+BpNode<Key, Value>* BpTree<Key, Value>::search(const Key &searchKey, Value& value)
 {
     if (root == nullptr) return nullptr;
     BpNode<Key, Value>* node = root;
@@ -303,32 +324,25 @@ BpNode<Key, Value>* BpTree<Key, Value>::search(const Key &searchKey, Value* valu
     // 现在node为某一叶节点
     if (node->search(searchKey, pos))
     { // 找到该搜索码
-        if (node->values[pos] != nullptr)
-        { // 存在储存值
-            if (value == nullptr)
-            { // 指针没有分配内存
-                value = new Value();
-            }
-            *value = *(node->values[pos]);
-        }
+        value = node->values[pos];
         return node;
     }
     else
     {
-        value = nullptr;
+        value = Value();
         return node;
     }
 }
 
 /**
  * @param searchKey: 搜索码
- * @param value: 如果找到，value赋值为对应的指针
+ * @param value: 如果找到，value赋值为对应的值
  * @return: 如果不存在，返回大于搜索码的最小键值所在结点（可以认为nullptr的搜索码为正无穷），否则返回该key所在的叶结点
  */
 template <class Key, class Value>
 BpNode<Key, Value>* BpTree<Key, Value>::search(const Key &searchKey)
 { // 不需要知道value
-    Value* value = nullptr;
+    Value value = Value();
     return this->search(searchKey, value);
 }
 
@@ -338,7 +352,7 @@ BpNode<Key, Value>* BpTree<Key, Value>::search(const Key &searchKey)
  * @return: 是否插入成功
  */
 template <class Key, class Value>
-bool BpTree<Key, Value>::insert(const Key &key, Value *const value)
+bool BpTree<Key, Value>::insert(const Key &key, const Value value)
 {
     if (root == nullptr)
     {
@@ -369,7 +383,8 @@ bool BpTree<Key, Value>::insert(const Key &key, Value *const value)
     }
     if (!node->insert(key, value))
     { // 插入失败，有重复值
-        return false;
+        Exception e(Type::EXISTED_KEY); // 抛出异常
+        throw e;
     }
     else
     { // 成功插入，需要判断是否进行调整
@@ -414,7 +429,9 @@ bool BpTree<Key, Value>::delete_single(const Key &key)
     int temp = 0;
     if (!node->search(key, temp))
     { // 没有找到对应的key
-        return false;
+        Exception e(Type::DELETING_KEY_NOT_FOUND);
+        throw e;
+//        return false;
     }
     if (count == 1)
     {
@@ -438,7 +455,7 @@ bool BpNode<Key, Value>::remove(const int &pos)
         kids[i+1] = kids[i+2];
     }
     keys[count - 1] = Key();
-    values[count - 1] = nullptr;
+    values[count - 1] = Value();
     kids[count] = nullptr;
     count --;
     return true;
@@ -481,7 +498,7 @@ bool BpTree<Key, Value>::delete_entry(BpNode<Key, Value> *node, const Key &key)
             bool right = true;
             if (parent->search(node->keys[0], pos))
             { // node中最小的键值出现在父节点中
-              // 此时返回的角标对应左兄弟
+                // 此时返回的角标对应左兄弟
                 right = false;
             }
             else
@@ -612,7 +629,7 @@ bool BpTree<Key, Value>::delete_entry(BpNode<Key, Value> *node, const Key &key)
  * @return: 是否有搜索结果
  */
 template <class Key, class Value>
-bool BpTree<Key, Value>::search_range(const Key &min, const Key &max, std::vector<Key>* keys, std::vector<Value*>* values, bool minEq, bool maxEq)
+bool BpTree<Key, Value>::search_range(const Key &min, const Key &max, std::vector<Key>* keys, std::vector<Value>* values, bool minEq, bool maxEq)
 {
     BpNode<Key, Value>* node_min = this->search(min);
     BpNode<Key, Value>* node_max = this->search(max);
@@ -638,7 +655,7 @@ bool BpTree<Key, Value>::search_range(const Key &min, const Key &max, std::vecto
     for ( pos = pos_min + !minEq, node = node_min;
           !(node == node_max && pos + !maxEq >= pos_max);
           ++pos
-        )
+            )
     {
         if (pos >= node->count)
         {
@@ -669,15 +686,13 @@ template <class Key, class Value>
 bool BpTree<Key, Value>::delete_range(const Key &min, const Key &max, bool minEq, bool maxEq)
 {
     std::vector<Key>* keys = new std::vector<Key>();
-    std::vector<Value*>* values = new std::vector<Value*>();
+    std::vector<Value>* values = new std::vector<Value>();
     if (search_range(min, max, keys, values, minEq, maxEq))
     { // 依次删除keys中元素
         while (!keys->empty())
         {
             delete_single(keys->back());
             keys->pop_back();
-//            delete values->back();
-//            values->pop_back();
         }
         return true;
     }
@@ -692,7 +707,7 @@ void BpTree<Key, Value>::read_from_disk_all()
 {
     std::cout<<"Read from disk:"<<std::endl;
     std::string file_path = "./database/index/" + file_name;
-    
+
     if(!init_file(file_path)) return; //如果没有这个文件，就直接返回
     std::cout<<"hi"<<std::endl;
     //否则需要读取该文件
@@ -792,9 +807,10 @@ int BpTree<Key, Value>::get_block_num(std::string file_path)
         block_num++;
         tmp = bm.fetchPage(file_path , block_num);
         if(block_num > MAXPAGEPOOLSIZE) return -1; //不是一个符合规范的索引文件
-    } 
+    }
     return block_num;
 }
+
 
 //将对象本身的二进制数据存入内存
 template <typename T>
@@ -804,11 +820,13 @@ void copyData2Mem(char* mem_addr, T& data, int data_size)
     memcpy(mem_addr, data_addr, data_size);
 }
 
+
 //存string对象至内存（string类需要特殊处理，实际上转换成了若干个char）
 void copyData2Mem(char* mem_addr, std::string& data, int data_size)
 {
     memcpy(mem_addr, data.c_str(), data.length());
 }
+
 
 //从内存读取对象的二进制数据，重构data
 template <typename T>
@@ -817,10 +835,30 @@ void readDataFromMem(char* mem_addr, T& data, int data_size)
     data = *(T*)mem_addr;
 }
 
+
 //从内存取string对象至data
 void readDataFromMem(char* mem_addr, std::string& data, int data_size)
 {
     data = std::string(mem_addr, data_size);
+}
+
+
+/**
+ * 释放以root为根的B+树的内存
+ * @param root: B+树的根
+ */
+template <class Key, class Value>
+void BpTree<Key, Value>::free_entry(BpNode<Key, Value> *root)
+{
+    if (!root->isLeaf()) // 需要释放子树内存
+    {
+        for (int i = 0;i <= root->count; ++i)
+        { // 释放子树内存
+            free_entry(root->kids[i]);
+            root->kids[i] = nullptr;
+        }
+    }
+    delete root; // 释放指针指向的内存区域
 }
 
 #endif //BPLUSTREE_BPTREE_H

@@ -1,5 +1,5 @@
 #include "Index_Manager.h"
-#include "API.h"
+
 
 
 IndexManager::IndexManager(API* api)
@@ -149,7 +149,7 @@ int IndexManager::searchIndex(std::string file_name, std::string key, int type)
             return -1;
         }
         int ret_float;
-        i->second->search(key_float, &ret_float);
+        i->second->search(key_float, ret_float);
         return ret_float; 
     }
     else if(type == TYPE_INT)
@@ -161,7 +161,7 @@ int IndexManager::searchIndex(std::string file_name, std::string key, int type)
             return -1;
         }
         int ret_int;
-        i->second->search(key_float, &ret_int);
+        i->second->search(key_float, ret_int);
         return ret_int; 
     }
     else
@@ -173,7 +173,7 @@ int IndexManager::searchIndex(std::string file_name, std::string key, int type)
             return -1;
         }
         int ret_string;
-        i->second->search(key_string, &ret_string);
+        i->second->search(key_string, ret_string);
         return ret_string; 
     }
     
@@ -199,36 +199,43 @@ void IndexManager::insertIndex(std::string file_name, std::string key, int block
         ss >> key_string;
     }
 
-    //找到对应的B+树，执行单键插入操作
-    if(type == TYPE_FLOAT)
+    try
     {
-        FLOATMAP::iterator i = float_index_map_.find(file_name);
-        if(i == float_index_map_.end())
+        //找到对应的B+树，执行单键插入操作
+        if(type == TYPE_FLOAT)
         {
-            std::cout << "Error: No index " << file_name << " exists!" << std::endl;
-            return;
+            FLOATMAP::iterator i = float_index_map_.find(file_name);
+            if(i == float_index_map_.end())
+            {
+                std::cout << "Error: No index " << file_name << " exists!" << std::endl;
+                return;
+            }
+            i->second->insert(key_float, blockID);
         }
-        i->second->insert(key_float, blockID);
+        else if(type == TYPE_INT)
+        {
+            INTMAP::iterator i = int_index_map_.find(file_name);
+            if(i == int_index_map_.end())
+            {
+                std::cout << "Error: No index " << file_name << " exists!" << std::endl;
+                return;
+            }
+            i->second->insert(key_int, blockID);
+        }
+        else
+        {
+            STRINGMAP::iterator i = string_index_map_.find(file_name);
+            if(i == string_index_map_.end())
+            {
+                std::cout << "Error: No index " << file_name << " exists!" << std::endl;
+                return;
+            }
+            i->second->insert(key_string, blockID);
+        }
     }
-    else if(type == TYPE_INT)
-    {
-        INTMAP::iterator i = int_index_map_.find(file_name);
-        if(i == int_index_map_.end())
-        {
-            std::cout << "Error: No index " << file_name << " exists!" << std::endl;
-            return;
-        }
-        i->second->insert(key_int, blockID);
-    }
-    else
-    {
-        STRINGMAP::iterator i = string_index_map_.find(file_name);
-        if(i == string_index_map_.end())
-        {
-            std::cout << "Error: No index " << file_name << " exists!" << std::endl;
-            return;
-        }
-        i->second->insert(key_string, blockID);
+    catch (Exception& e)
+    { // 插入异常
+
     }
 }
 
@@ -251,36 +258,43 @@ void IndexManager::deleteIndexByKey(std::string file_name, std::string key, int 
     {
         ss >> key_string;
     }
-    
-    //找到对应的B+树，执行单键删除操作
-    if(type == TYPE_FLOAT)
+
+    try
     {
-        FLOATMAP::iterator i = float_index_map_.find(file_name);
-        if(i == float_index_map_.end())
+        //找到对应的B+树，执行单键删除操作
+        if(type == TYPE_FLOAT)
         {
-            std::cout << "Error: No index " << file_name << " exists!" << std::endl;
-            return;
+            FLOATMAP::iterator i = float_index_map_.find(file_name);
+            if(i == float_index_map_.end())
+            {
+                std::cout << "Error: No index " << file_name << " exists!" << std::endl;
+                return;
+            }
+            i->second->delete_single(key_float);
         }
-        i->second->delete_single(key_float);
+        else if(type == TYPE_INT)
+        {
+            INTMAP::iterator i = int_index_map_.find(file_name);
+            if(i == int_index_map_.end())
+            {
+                std::cout << "Error: No index " << file_name << " exists!" << std::endl;
+                return;
+            }
+            i->second->delete_single(key_int);
+        }
+        else
+        {
+            STRINGMAP::iterator i = string_index_map_.find(file_name);
+            if(i == string_index_map_.end())
+            {
+                std::cout << "Error: No index " << file_name << " exists!" << std::endl;
+                return;
+            }
+            i->second->delete_single(key_string);
+        }
     }
-    else if(type == TYPE_INT)
-    {
-        INTMAP::iterator i = int_index_map_.find(file_name);
-        if(i == int_index_map_.end())
-        {
-            std::cout << "Error: No index " << file_name << " exists!" << std::endl;
-            return;
-        }
-        i->second->delete_single(key_int);
-    }
-    else
-    {
-        STRINGMAP::iterator i = string_index_map_.find(file_name);
-        if(i == string_index_map_.end())
-        {
-            std::cout << "Error: No index " << file_name << " exists!" << std::endl;
-            return;
-        }
-        i->second->delete_single(key_string);
+    catch (Exception& e)
+    { // 删除异常
+
     }
 }
