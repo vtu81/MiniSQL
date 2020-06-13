@@ -149,8 +149,12 @@ int IndexManager::searchIndex(std::string file_name, std::string key, int type)
             return -1;
         }
         int ret_float;
-        i->second->search(key_float, ret_float);
-        return ret_float; 
+        if(i->second->search(key_float, ret_float))
+        {
+            return ret_float; 
+        }
+        std::cout << "Error: No key with value " << key_float << " exists in index " << file_name << std::endl;
+        return -1;
     }
     else if(type == TYPE_INT)
     {
@@ -161,8 +165,12 @@ int IndexManager::searchIndex(std::string file_name, std::string key, int type)
             return -1;
         }
         int ret_int;
-        i->second->search(key_float, ret_int);
-        return ret_int; 
+        if(i->second->search(key_float, ret_int))
+        {
+            return ret_int;
+        }
+        std::cout << "Error: No key with value " << key_int << " exists in index " << file_name << std::endl;
+        return -1;
     }
     else
     {
@@ -173,8 +181,12 @@ int IndexManager::searchIndex(std::string file_name, std::string key, int type)
             return -1;
         }
         int ret_string;
-        i->second->search(key_string, ret_string);
-        return ret_string; 
+        if(i->second->search(key_string, ret_string))
+        {
+            return ret_string;
+        }
+        std::cout << "Error: No key with value " << key_string << " exists in index " << file_name << std::endl;
+        return -1; 
     }
     
 }
