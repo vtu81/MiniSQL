@@ -58,7 +58,10 @@ public:
     //@file_name：索引文件名（由record manager中的函数生成并传入）
     //@key: 待搜索的键值
     //@type: 索引的类型
-    //return: 返回记录所在的blockID
+    //return: 
+    //找到的话返回记录所在blockID
+    //找不到key则返回-1
+    //没有该index返回-2
     int searchIndex(std::string file_name, std::string key, int type);
     
     //（不要求范围搜索，故暂时不实现）多键值范围搜索

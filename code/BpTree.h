@@ -383,7 +383,7 @@ bool BpTree<Key, Value>::insert(const Key &key, const Value value)
     }
     if (!node->insert(key, value))
     { // 插入失败，有重复值
-        Exception e(Type::EXISTED_KEY); // 抛出异常
+        Exception e(Type::INDEX_KEY_EXISTED); // 抛出异常
         throw e;
     }
     else
@@ -429,7 +429,7 @@ bool BpTree<Key, Value>::delete_single(const Key &key)
     int temp = 0;
     if (!node->search(key, temp))
     { // 没有找到对应的key
-        Exception e(Type::DELETING_KEY_NOT_FOUND);
+        Exception e(Type::INDEX_DELETE_KEY_NOT_FOUND);
         throw e;
 //        return false;
     }

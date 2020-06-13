@@ -10,8 +10,9 @@
 
 typedef enum // 异常类型
 {
-    EXISTED_KEY = 0, // 插入数据时，数据的key值已经存在
-    DELETING_KEY_NOT_FOUND, // 删除数据时，对应的Key值不存在
+    //应该在API模块中提前判定以避免异常！但以防万一，还是在必要时抛出异常
+    INDEX_KEY_EXISTED = 0, // 插入数据时，数据的key值已经存在
+    INDEX_DELETE_KEY_NOT_FOUND, // 删除数据时，对应的Key值不存在
 
 } Type;
 
