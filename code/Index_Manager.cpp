@@ -1,5 +1,5 @@
 #include "Index_Manager.h"
-
+#include "API.h"
 
 
 IndexManager::IndexManager(API* api)
