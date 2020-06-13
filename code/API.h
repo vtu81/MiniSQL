@@ -2,14 +2,21 @@
 #ifndef _API_H_
 #define _API_H_
 
-#include "Index_Manager.h"
-#include "Record_Manager.h"
-#include "Catalog_Manager.h"
+#include <iostream>
+#include <vector>
+#include <string>
+#include "Condition.h"
+#include "Attribute.h"
+/*目录下暂时没有的头文件，以后可能会用到*/
+// #include "IndexInfo.h"
+// #include "Basic.h"
+// #include "Exception.h"
 
-//头文件引用and类声明还不规范；待最后一起调整
-extern CatalogManager catalog_manager;
-extern RecordManager record_manager;
-extern IndexManager index_manager;
+using namespace std;
+
+class CatalogManager;
+class RecordManager;
+class IndexManager;
 
 class API
 {
@@ -20,6 +27,7 @@ private:
     没有列全，用到时自行补足即可*/
     //To be continued.
 public:
+    /*下面3个指针在main模块中才初始化，避免和3个manager产生冲突*/
     //指向全局catalog manager的指针
     CatalogManager *cm;
     //指向全局record manager的指针
@@ -28,13 +36,8 @@ public:
     IndexManager *im;
 
     /*外部接口*/
-    API()
-    {
-        cm = &catalog_manager;
-        rm = &record_manager;
-        im = &index_manager;
-    }
-    ~API();
+    API(){};
+    ~API(){};
     //创建表
     void createTable(string table_name);
     //删除表
@@ -44,9 +47,9 @@ public:
     //删除索引
     void dropIndex(string table_name);
     //展示记录 -- 无条件
-    void showRecord(string table_name, vector<stirng>* attribute_names);
+    void showRecord(string table_name, vector<string>* attribute_names);
     //展示记录 -- 有条件
-    void showRecord(string table_name, vector<stirng>* attribute_names, vector<Condition>* conditions);
+    void showRecord(string table_name, vector<string>* attribute_names, vector<Condition>* conditions);
     //插入记录
     void insertRecord(string table_name, vector<string>* record_content);
     //删除记录 -- 无条件

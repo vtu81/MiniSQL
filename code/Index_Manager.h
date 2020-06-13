@@ -2,14 +2,13 @@
 #ifndef _INDEX_MANAGER_H_
 #define _INDEX_MANAGER_H_
 
-#include "Buffer_Manager.h"
 #include "BpTree.h"
-#include "API.h"
 #include <map>
 #include <vector>
 #include <sstream>
 #include <string>
 
+class API;
 
 class IndexManager
 {
