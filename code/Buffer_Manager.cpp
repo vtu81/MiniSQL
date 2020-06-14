@@ -126,6 +126,7 @@ int BufferManager::outputPage(int page_id)
 	//若此Page为有效的Page，即内部内容有意义
 	if (page_pool_[page_id].getValid())
 	{
+		page_pool_[page_id].setValid(false);
 		FILE* f = fopen(filename.c_str(), "r+");
 		if (f == NULL)
 		{
