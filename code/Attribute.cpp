@@ -12,6 +12,10 @@ int Attribute::getType() {
 	return type;
 }
 
+string Attribute::indexNameGet() {
+	return index;
+}
+
 int Attribute::getSize() {
 	if (type == TYPE_FLOAT) {
 		return sizeof(float);
@@ -22,3 +26,4 @@ int Attribute::getSize() {
 	else {
 		return sizeof(char)*type;
 }
+
