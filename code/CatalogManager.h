@@ -14,7 +14,11 @@
 #include "Basic.h"
 #include "Exception.h"
 
-
+#ifndef CONST
+#define TABLEPATH "./database/catalog"
+#define PAGESIZE 4096
+#define MAXFRAMESIZE 100
+#endif
 
 
 class CatalogManager{
@@ -90,7 +94,7 @@ private:
     /*get the index of the table*/
     Index GetIndex(std::string t_name);
     /*get the size of the file*/
-    int GetBlockNum(std::string t_name);
+    int fetchBlockNum(std::string t_name);
 };
 
 #endif
