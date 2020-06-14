@@ -39,7 +39,7 @@ public:
     API(){};
     ~API(){};
     //创建表
-    void createTable(string table_name);
+    void createTable(string table_name, vector<Attribute>* attributes, string primary_key_name, int primary_key_location);
     //删除表
     void dropTable(string table_name);
     //创建索引
