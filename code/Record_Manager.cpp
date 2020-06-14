@@ -20,7 +20,7 @@ int RecordManager::dropTable(string tablename) {
 	int i = 0;
 	int PageID = bm->fetchPageID(TableFileName.c_str(),i);
 	while (PageID != PAGENOTEXIST) {
-		//ÕâÀï°ÑËùÓÐblock¶¼outputÒ»±é
+		//è¿™é‡ŒæŠŠæ‰€æœ‰blockéƒ½outputä¸€é
 		bm->outputPage(PageID);
 		i++;
 		PageID=bm->fetchPageID(TableFileName.c_str(),i);
@@ -47,7 +47,7 @@ int RecordManager::dropIndex(string indexname) {
 	int i = 0;
 	int PageID = bm->fetchPageID(IndexFileName.c_str(), i);
 	while (PageID != PAGENOTEXIST) {
-		//ÕâÀï°ÑËùÓÐblock¶¼outputÒ»±é
+		//è¿™é‡ŒæŠŠæ‰€æœ‰blockéƒ½outputä¸€é
 		bm->outputPage(PageID);
 		i++;
 		PageID = bm->fetchPageID(IndexFileName.c_str(), i);
@@ -103,9 +103,9 @@ int RecordManager::recordBlockShow(string tableFileName, vector<string>* attribu
 	else {
 		int count = 0;
 		vector<Attribute> attributeVector;
-		//ÐèÒªµ÷ÓÃº¯Êý»ñµÃÒ»ÌõrecordµÄ´óÐ¡£¬recordSizeGet()Êµ¼ÊÉÏµ÷ÓÃÁËcatalog managerµÄº¯Êý
+		//éœ€è¦è°ƒç”¨å‡½æ•°èŽ·å¾—ä¸€æ¡recordçš„å¤§å°ï¼ŒrecordSizeGet()å®žé™…ä¸Šè°ƒç”¨äº†catalog managerçš„å‡½æ•°
 		int recordSize = api->recordSizeGet(tableName);
-		//½«±íÖÐµÄattribute¿½±´µ½attributeVectorÖÐ
+		//å°†è¡¨ä¸­çš„attributeæ‹·è´åˆ°attributeVectorä¸­
 		api->attributeGet(tableName, &attributeVector);
 		int usingSize = findContentBegin(recordBegin);
 		char* usingBegin = bm->fetchPage(tableFileName, pageID);
@@ -364,8 +364,13 @@ char* RecordManager::findFirstUsableBlock(string tablename) {
 
 int RecordManager::findContentBegin(char* block_content) {
 	int i = 0;
-	while (block_content[i] != '/0') {
+	while (block_content[i] != '/0'&&i<PAGESIZE) {
 		i++;
 	}
-	return i;
+	if (i == PAGESIZE) {
+		return -1;
+	}
+	else {
+		return i;
+	}
 }
