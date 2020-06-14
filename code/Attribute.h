@@ -9,18 +9,27 @@ using namespace std;
 class Attribute
 {
 public:
+	//属性名
 	string name;
-	int type;                  //the type of the attribute,-1 represents float, 0 represents int, other positive integer represents char and the value is the number of char)
+	//属性类型，float=-1,int=0,长度为n的string=n
+	int type;
+	//是否为unique
 	bool ifUnique;
-	string index;         // default value is "", representing no index
+	//初始值为""，即没有任何index
+	string index;      
+	//构造函数
 	Attribute(string n, int t, bool i);
 
 public:
+	//定义不同类型对应的数
 	int static const TYPE_FLOAT = -1;
 	int static const TYPE_INT = 0;
+	//返回attribute类型
 	int getType();
+	//返回attribute大小
 	int getSize();
-	string indexNameGet() { return index; }
+	//返回index名称
+	string indexNameGet();
 
 };
 
