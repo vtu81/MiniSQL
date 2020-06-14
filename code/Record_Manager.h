@@ -12,6 +12,8 @@ using namespace std;
 
 class RecordManager {
 public:
+	string getTableFileName(string tablename);
+	string getIndexFileName(string indexname);
 	//创建table时调用
 	//创建存储table对应的文件
 	//@tablename:table名称
@@ -84,8 +86,7 @@ private:
 
 	char* findFirstUsableBlock(string tablename);
 	int findContentBegin(char* block_content);
-	string getTableFileName(string tablename);
-	string getIndexFileName(string indexname);
+
 };
 
 
