@@ -34,7 +34,7 @@ public:
     static const int TYPE_FLOAT = -1;
     //0表示数据类型为int
     static const int TYPE_INT = 0;
-    //正数表示数据类型为字符串，且值为字符串长度; 如34表示char(34)
+    //正数表示数据类型为字符串，且值为字符串长度 + 1; 如34表示char(33)
 
     //构造函数
     //利用API间接调用catalog manager获取各表已有的index，在磁盘上找到对应的文件重构B+树
