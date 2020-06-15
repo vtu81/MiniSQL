@@ -8,6 +8,10 @@
 #include"Buffer_Manager.h"
 #include"Condition.h"
 #include"Attribute.h"
+
+#define RECORDFILEPATH "./database/record"
+#define INDEXFILEPATH "./database/index"
+
 using namespace std;
 
 class RecordManager {
