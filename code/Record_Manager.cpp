@@ -57,13 +57,13 @@ int RecordManager::dropIndex(string indexname) {
 
 string RecordManager::getTableFileName(string tablename) {
 	string A;
-	A = "TABLE_FILE_" + tablename;
+	A = RECORDFILEPATH+ tablename;
 	return A;
 }
 
 string RecordManager::getIndexFileName(string indexname) {
 	string A;
-	A = "INDEX_FILE_" + indexname;
+	A = INDEXFILEPATH + indexname;
 	return A;
 }
 
@@ -286,6 +286,7 @@ int RecordManager::indexRecordBlockAlreadyInsert(string tableName, string indexN
 
 			if (attributeVector[i].index == indexName)
 			{
+				//这里有一个insert index的函数，判断type在api中完成，然后再调用im函数进行insert
 				api->indexInsert(indexName, contentBegin, type, block->offsetNum);
 				count++;
 			}
@@ -345,7 +346,6 @@ bool RecordManager::contentConditionFit(char* content, int type, Condition* cond
 	}
 	else
 	{
-		
 		return condition->ifRight(content);
 	}
 	return true;
