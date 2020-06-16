@@ -7,6 +7,7 @@
 #include <iostream>
 #include <vector>
 #include <string.h>
+#include <algorithm>
 #include "Exception.h"
 #include "Buffer_Manager.h"
 
@@ -711,10 +712,8 @@ void BpTree<Key, Value>::read_from_disk_all()
             readDataFromMem(page_start + offset, value, sizeof(value));
             offset += sizeof(value);
 
-            //Output for debug.
-            //还没有将(key, value)插入树中，待下一个版本再补充
-            //To be continued.
-            // std::cout << "[debug]In BpTree::read_from_disk_all();Initializing " << "key: " << key << ", value: " << value << std::endl;
+            //将(key, value)插入树中
+            // std::cout << "[debug]In BpTree::read_from_disk_all();Initializing " << "key: " << key << ", value: " << value << std::endl; //debug
             this->insert(key, value);
         }
     }
