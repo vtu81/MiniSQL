@@ -42,4 +42,15 @@ class index_not_exist{};
 class index_full{};
 class index_exist{};
 
+// interpreter出现的异常
+class multiple_tables{}; // 试图访问多个表
+class invalid_operator{}; // 比较操作符（大于、等于、小于、...）错误
+class insert_syntax_error{}; // 插入语句语法错误
+class delete_syntax_error{}; // 删除语句语法错误
+class create_table_syntax_error{}; // 创建表格语句语法错误
+class create_index_syntax_error{}; // 创建索引语法错误
+class char_size_overflow{}; // char类型数组的长度为0~255
+class unknown_data_type{}; // 创建表格指定的类型错误
+class primary_key_not_exist{}; // 创建表格时没有指明主码
+
 #endif //BPLUSTREE_EXCEPTION_H
