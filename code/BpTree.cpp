@@ -11,7 +11,7 @@ void test_BpTree_main()
 {
     std::srand(time(nullptr));
     std::set<int> set;
-    BpTree<int, int>* tree = new BpTree<int, int>(7);
+    BpTree<int, int>* tree = new BpTree<int, int>("test", 3, 7);
     int length = rand() % 1000000;
     int delete_num = length / 100;
     for (int i = 0;i < length; ++i)
