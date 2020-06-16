@@ -54,18 +54,13 @@ void IndexManager::createIndex(std::string file_name, int type)
     else if(type == TYPE_INT)
         key_size = sizeof(int);
     else if(type > 0)
-        key_size = type - 1;
+        key_size = type;
     else
     {
         std::cout << "[debug]Error: In IndexManager::createIndex(); Invalid type!"<<std::endl; //调试用
         return;
     }
-    if(key_size == 0)
-    {
-        //char(0)情形：不继续，直接返回
-        std::cout << "[debug]Warning: In IndexManager::createIndex(); char(0) detected!"<<std::endl;
-        return;
-    }
+    
     //获取B+树的合适度数；和B+树记录到磁盘上的数据格式有关，可能需要调整
     //预留了一个位置给单个block中的结束符'#'
     //To be continued.
