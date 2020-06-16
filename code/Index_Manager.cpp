@@ -18,13 +18,13 @@ IndexManager::IndexManager(API* api)
 
 IndexManager::~IndexManager()
 {
-    //将所有map中保存的B+树记录到磁盘
+    //将所有map中保存的B+树记录到磁盘 -- delete暂时有问题，先注释掉，不影响代码正常运行
     for(auto& i: float_index_map_)
     {
         if(i.second)
         {
             i.second->write_back_to_disk_all();
-            delete i.second;
+            //delete i.second;
         }
     }
     for(auto& i: int_index_map_)
@@ -32,7 +32,7 @@ IndexManager::~IndexManager()
         if(i.second)
         {
             i.second->write_back_to_disk_all();
-            delete i.second;
+            //delete i.second;
         }
     }
     for(auto& i: string_index_map_)
@@ -40,7 +40,7 @@ IndexManager::~IndexManager()
         if(i.second)
         {
             i.second->write_back_to_disk_all();
-            delete i.second;
+            //delete i.second;
         }
     }
 }
