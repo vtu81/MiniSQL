@@ -35,8 +35,8 @@ void CatalogManager::CreateTable(std::string name, Attribute Attr, int primary, 
     if(blocknumber<=0)
         blocknumber=1;
     for(int current_block=0;current_block<blocknumber;current_block++){
-        char* buffer = BM.fecthPage(TABLEPATH , current_block);
-        int page_id = BM.fetchPageId(TABLEPATH , current_block);
+        char* buffer = BM.fetchPage(TABLEPATH , current_block);
+        int page_id = BM.fetchPageID(TABLEPATH , current_block);
      
         int length=0;
         for(length=0;length<PAGESIZE&&buffer[length]!='\0'&&buffer[length]!='#';length++){}
