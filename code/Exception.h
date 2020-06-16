@@ -15,7 +15,7 @@ typedef enum // 异常类型
     INDEX_DELETE_KEY_NOT_FOUND, // 删除数据时，对应的Key值不存在
 
 } Type;
-
+//Exception异常应当尽可能被避免，如果发生了则是预期之外的情形，表示代码有问题
 class Exception
 {
 public:
@@ -34,5 +34,12 @@ public:
 
     }
 };
+//下面的异常为预期内的异常！主要在catalog_manager中抛出，在API中处理
+class table_exist{};
+class table_not_exist{};
+class attribute_not_exist{};
+class index_not_exist{};
+class index_full{};
+class index_exist{};
 
 #endif //BPLUSTREE_EXCEPTION_H
