@@ -180,7 +180,7 @@ int IndexManager::searchIndex(std::string file_name, std::string key, int type)
             return -2;
         }
         int* ret_int_ptr;
-        if((ret_int_ptr = i->second->search(key_float)) != nullptr)
+        if((ret_int_ptr = i->second->search(key_int)) != nullptr)
         {
             return *ret_int_ptr;
         }

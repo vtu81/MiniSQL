@@ -51,7 +51,7 @@ public:
     int MAX_KEY; // 至多储存的key数目
     Key* keys; // key数组
     Value* values; // value数组
-    BpNode<Key, Value>** ptrs; // 结点指针数组，对于叶节点，ptrs[MAX_KEY+1]指向右兄弟
+    BpNode<Key, Value>** ptrs; // 结点指针数组，对于叶节点，ptrs[MAX_KEY]指向右兄弟
 };
 
 template <class Key, class Value>
@@ -700,6 +700,7 @@ void BpTree<Key, Value>::read_from_disk_all()
     int block_num = get_block_num(file_path);
     for (int i = 0; i < block_num; i++)
     {
+        std::cout << i << std::endl;
         char* page_start = bm.fetchPage(file_path, i);
         int offset = 0;
         while(offset < PAGESIZE && page_start[offset] != '#')
@@ -729,14 +730,14 @@ void BpTree<Key, Value>::write_back_to_disk_all()
     // int block_num = get_block_num(file_path);
 
     int i, j;
-    BpNode<Key, Value>* leaf_tmp = minNode;
+    BpNode<Key, Value>* leaf_tmp = get_minNode();
     for (j = 0, i = 0; leaf_tmp != nullptr; j++)
     {
         std::cout<<"Hello!"<<std::endl;
         int offset = 0; //块内扫描地址偏移
         char* page_start = bm.fetchPage(file_path, j);
         memset(page_start, 0, PAGESIZE); //清空缓冲页
-        for(i = 0; i < leaf_tmp->count; i++)
+        for(i = 0; i < leaf_tmp->key_count; i++)
         {
             //读入一个key
             copyData2Mem(page_start + offset, leaf_tmp->keys[i], key_size);
@@ -754,7 +755,7 @@ void BpTree<Key, Value>::write_back_to_disk_all()
         bm.markPageDirty(page_id);
         //Output for debug.
         if(offset > PAGESIZE) std::cout<<"[debug]In BpTree::write_back_to_disk_all();BpTree node too big! A single page cannot hold it."<<std::endl; //for debug
-        leaf_tmp = leaf_tmp->rightNode;
+        leaf_tmp = leaf_tmp->ptrs[leaf_tmp->MAX_KEY];
     }
     //结束块，首字节也为'#'
     char* page_start = bm.fetchPage(file_path, j);
@@ -775,7 +776,7 @@ int BpTree<Key, Value>::init_file(std::string file_path)
         fclose(f);
         f = fopen(file_path.c_str() , "r");
         fclose(f);
-        cout << "[debug]In BpTree::init_file();Index file should be created earlier!" << endl;
+        std::cout << "[debug]In BpTree::init_file();Index file should be created earlier!" << std::endl;
         return 0;
     }
     //否则确实存在这个文件
@@ -804,13 +805,13 @@ int BpTree<Key, Value>::get_block_num(std::string file_path)
         }
     }
     if(initialized == false) return 0; //第一个块没有'#'，说明这个文件刚刚被创建，同样没有block
-    
     block_num++; //第一个块处理完了，直接从第二个块开始：找到第一个字节是'#'的块，其blockID就是block_num
+    tmp = bm.fetchPage(file_path, block_num); //取第二个块
     while(tmp[0] != '#')
     {
         block_num++;
         if(block_num > MAXPAGEPOOLSIZE) return -1; //第一个块有'#'，但后面没有任何一个块的开头是'#'，则不是一个符合规范的索引文件
-        tmp = bm.fetchPage(file_path , block_num);
+        tmp = bm.fetchPage(file_path, block_num);
     }
     return block_num;
 }
