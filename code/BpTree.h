@@ -688,12 +688,11 @@ bool BpTree<Key, Value>::delete_single(const Key &key)
 template <class Key, class Value>
 void BpTree<Key, Value>::read_from_disk_all()
 {
-    std::cout<<"Read from disk:"<<std::endl;
-    std::string file_path = "./database/index/" + file_name;
+    std::cout<<"[debug]In BpTree::read_from_disk_all();Reading from disk:"<<std::endl;
+    std::string file_path = file_name; //传入的file_name已经是路径了！
 
-    if(!init_file(file_path)) return; //如果没有这个文件，就直接返回
-    std::cout<<"hi"<<std::endl;
-    //否则需要读取该文件
+    init_file(file_path); //（确保文件存在，尽管RecordManager有createIndex()函数帮我们创建索引文件）
+    //根据block_num，读取该文件
     int block_num = get_block_num(file_path);
     for (int i = 0; i < block_num; i++)
     {
@@ -711,7 +710,8 @@ void BpTree<Key, Value>::read_from_disk_all()
             //Output for debug.
             //还没有将(key, value)插入树中，待下一个版本再补充
             //To be continued.
-            std::cout << "key: " << key << ", value: " << value << std::endl;
+            std::cout << "[debug]In BpTree::read_from_disk_all();Initializing " << "key: " << key << ", value: " << value << std::endl;
+            this->insert(key, value);
         }
     }
 }
@@ -719,9 +719,9 @@ void BpTree<Key, Value>::read_from_disk_all()
 template <class Key, class Value>
 void BpTree<Key, Value>::write_back_to_disk_all()
 {
-    std::string file_path = "./database/index/" + file_name;
+    std::string file_path = file_name; //传入的file_name已经是路径了！
     // std::cout<<"file path: "<<file_path<<std::endl;
-    init_file(file_path);
+    init_file(file_path); //（确保文件存在，尽管RecordManager有createIndex()函数帮我们创建索引文件）
     // int block_num = get_block_num(file_path);
 
     int i, j;
@@ -737,10 +737,10 @@ void BpTree<Key, Value>::write_back_to_disk_all()
             //读入一个key
             copyData2Mem(page_start + offset, leaf_tmp->keys[i], key_size);
             offset += key_size;
-            //读入一个value（注意：value中存的是指针）
+            //读入一个value
             //To be continued.
-            copyData2Mem(page_start + offset, *(leaf_tmp->values[i]), sizeof(Value));
-            std::cout<<"# "<<*(leaf_tmp->values[i])<<std::endl;
+            copyData2Mem(page_start + offset, leaf_tmp->values[i], sizeof(Value));
+            //std::cout<<"# "<<leaf_tmp->values[i]<<std::endl;
             offset += sizeof(Value);
         }
         //块内结束标志'#'
@@ -749,7 +749,7 @@ void BpTree<Key, Value>::write_back_to_disk_all()
         int page_id = bm.fetchPageID(file_path, j);
         bm.markPageDirty(page_id);
         //Output for debug.
-        if(offset > PAGESIZE) std::cout<<"BpTree node too big! A single page cannot hold it."<<std::endl; //for debug
+        if(offset > PAGESIZE) std::cout<<"[debug]In BpTree::write_back_to_disk_all();BpTree node too big! A single page cannot hold it."<<std::endl; //for debug
         leaf_tmp = leaf_tmp->rightNode;
     }
     //结束块，首字节也为'#'
@@ -766,11 +766,12 @@ int BpTree<Key, Value>::init_file(std::string file_path)
 {
     FILE* f = fopen(file_path.c_str() , "r");
     if (f == NULL) {
-        //不存在这个文件，创建它
+        //不存在这个文件，创建它（应该避免，索引文件应当由record manager提前创建好）
         f = fopen(file_path.c_str(), "w+");
         fclose(f);
         f = fopen(file_path.c_str() , "r");
         fclose(f);
+        cout << "[debug]In BpTree::init_file();Index file should be created earlier!" << endl;
         return 0;
     }
     //否则确实存在这个文件
@@ -784,12 +785,28 @@ int BpTree<Key, Value>::get_block_num(std::string file_path)
 {
     char* tmp;
     int block_num = 0;
+    bool initialized = false; //第一个块是否有#号
     tmp = bm.fetchPage(file_path, block_num);
+
+    //因为文件可能刚刚创建，没有我们自定义的结束符'#'，所以需要单独处理第一个块！
+    if(tmp[0] == '#') return 0; //第一个块第一个字节是'#'，表示没有block
+    //遍历第一个块，判定第一个块是否有#号
+    for(int i = 1; i < PAGESIZE; i++)
+    {
+        if(tmp[i] == '#')
+        {
+            initialized = true;
+            break;
+        }
+    }
+    if(initialized == false) return 0; //第一个块没有'#'，说明这个文件刚刚被创建，同样没有block
+    
+    block_num++; //第一个块处理完了，直接从第二个块开始：找到第一个字节是'#'的块，其blockID就是block_num
     while(tmp[0] != '#')
     {
         block_num++;
+        if(block_num > MAXPAGEPOOLSIZE) return -1; //第一个块有'#'，但后面没有任何一个块的开头是'#'，则不是一个符合规范的索引文件
         tmp = bm.fetchPage(file_path , block_num);
-        if(block_num > MAXPAGEPOOLSIZE) return -1; //不是一个符合规范的索引文件
     }
     return block_num;
 }
