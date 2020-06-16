@@ -844,6 +844,7 @@ void readDataFromMem(char* mem_addr, T& data, int data_size)
 void readDataFromMem(char* mem_addr, std::string& data, int data_size)
 {
     data = std::string(mem_addr, data_size);
+    data.erase(std::remove(data.begin(), data.end(), '\0'), data.end()); //删除（结尾）所有多余的'\0'，否则会判定即便前面的字符串相同的两个string不相等！
 }
 
 
