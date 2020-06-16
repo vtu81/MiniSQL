@@ -14,22 +14,22 @@ void API::createIndex(string index_name, string table_name, string attribute_nam
         //初始化catalog数据，并检测异常
         cm->CreateIndex(index_name, table_name, attribute_name);
     }
-    catch(table_not_exist)
+    catch(table_not_exist e)
     {
         cout << "Table " << table_name << " not exists!" << endl;
         return;
     }
-    catch(attribute_not_exist)
+    catch(attribute_not_exist e)
     {
         cout << "Attribute " << attribute_name << " not exists!" << endl;
         return;
     }
-    catch(index_full)
+    catch(index_full e)
     {
         cout << "Indices on table " << table_name << " full!" << endl;
         return;
     }
-    catch(index_exist)
+    catch(index_exist e)
     {
         cout << "Index " << index_name << " already exists!" << endl;
         return;
@@ -75,12 +75,12 @@ void API::dropIndex(string table_name, string index_name)
     {
         cm->DropIndex(table_name, index_name);
     }
-    catch(table_not_exist)
+    catch(table_not_exist e)
     {
         cout << "Table " << table_name << " not exists!" << endl;
         return;
     }
-    catch(index_not_exist)
+    catch(index_not_exist e)
     {
         cout << "Index " << index_name << " on table " << table_name << " not exists!" << endl;
         return;
