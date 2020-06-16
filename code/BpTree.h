@@ -45,7 +45,7 @@ public:
 public:
     BpNode(int MAX_KEY, bool isLeaf);
     ~BpNode();
-private:
+public:
     bool isLeaf; // 是否为叶节点
     int key_count; // 目前储存的key数目
     int MAX_KEY; // 至多储存的key数目
@@ -81,6 +81,7 @@ public:
     bool delete_single(const Key& key);
     BpTree(std::string file_name, int key_size, int MAX_KEY);
     void write_back_to_disk_all();
+    BpNode<Key, Value>* get_minNode();
     void read_from_disk_all();
     ~BpTree();
 private:
@@ -229,7 +230,10 @@ BpTree<Key, Value>::BpTree(std::string file_name, int key_size, int MAX_KEY)
 template <class Key, class Value>
 BpTree<Key, Value>::~BpTree()
 {
-    if (root != nullptr) delete root;
+    if (root != nullptr)
+    {
+        free_entry(root);
+    }
 }
 
 
@@ -843,4 +847,39 @@ void readDataFromMem(char* mem_addr, std::string& data, int data_size)
 }
 
 
+/* 返回B+树最左边的叶节点 */
+template <class Key, class Value>
+BpNode<Key, Value>* BpTree<Key, Value>::get_minNode()
+{
+    if (root == nullptr)
+    { // B+树为空
+        return nullptr;
+    }
+    BpNode<Key, Value>* node = root;
+    while (!node->isLeaf)
+    {
+        node = node->ptrs[0];
+    }
+    return node;
+}
+
+/* 辅助清内存函数，清空以root为根节点的B+子树的内存 */
+template <class Key, class Value>
+void BpTree<Key, Value>::free_entry(BpNode<Key, Value> *root)
+{
+    if (root->isLeaf)
+    {
+        delete root;
+    }
+    else
+    {
+        for (int i = 0;i <= root->key_count; ++i)
+        {
+            free_entry(root->ptrs[i]);
+            root->ptrs[i] = nullptr;
+        }
+        delete root;
+        root = nullptr;
+    }
+}
 #endif //BPLUSTREE_BPTREE_H
