@@ -24,11 +24,10 @@ BpTree<int, double>* tree = new BpTree<int, double>(std::string file_name, int k
 ```c++
 /**
 * @param searchKey: 搜索码
-* @param value: 如果找到，*value赋值为对应的储存值
-* @return: 如果不存在，返回大于搜索码的最小键值所在结点（可以认为nullptr的搜索码为正无穷），否则返回该key所在的叶结点
+* @return: 如果找到，*value赋值为对应的储存值，否则为nullptr
 */
 template <class Key, class Value>
-BpNode<Key, Value>* BpTree<Key, Value>::search(const Key &searchKey, Value* value)
+Value* BpTree<Key, Value>::search(const Key &searchKey)
 ```
 
 【2】范围查询
@@ -39,12 +38,10 @@ BpNode<Key, Value>* BpTree<Key, Value>::search(const Key &searchKey, Value* valu
  * @param max: 范围搜索的最大值
  * @param minEq: 是否允许取最小值，默认允许
  * @param maxEq: 是否允许取最大值，默认允许
- * @param keys: 返回的搜索结果key数组
- * @param values: 返回的搜索结果values数组
- * @return: 是否有搜索结果
+ * @return: 返回的搜索结果valye数组
  */
 template <class Key, class Value>
-bool BpTree<Key, Value>::search_range(const Key &min, const Key &max, std::vector<Key>* keys, std::vector<Value*>* values, bool minEq = true, bool maxEq = true);
+std::vector<Value*> BpTree<Key, Value>::search_range(const Key &min, const Key &max, bool minEq = true, bool maxEq = true);
 ```
 
 【3】单Key-Value插入
@@ -56,7 +53,7 @@ bool BpTree<Key, Value>::search_range(const Key &min, const Key &max, std::vecto
  * @return: 是否插入成功
  */
 template <class Key, class Value>
-bool BpTree<Key, Value>::insert(const Key &key, Value *const value);
+bool BpTree<Key, Value>::insert(const Key &key, const Value& value);
 ```
 
 【4】单Key删除
