@@ -692,7 +692,7 @@ bool BpTree<Key, Value>::delete_single(const Key &key)
 template <class Key, class Value>
 void BpTree<Key, Value>::read_from_disk_all()
 {
-    std::cout<<"[debug]In BpTree::read_from_disk_all();Reading from disk:"<<std::endl;
+    // std::cout<<"[debug]In BpTree::read_from_disk_all();Reading from disk:"<<std::endl;
     std::string file_path = file_name; //传入的file_name已经是路径了！
 
     init_file(file_path); //（确保文件存在，尽管RecordManager有createIndex()函数帮我们创建索引文件）
@@ -700,7 +700,6 @@ void BpTree<Key, Value>::read_from_disk_all()
     int block_num = get_block_num(file_path);
     for (int i = 0; i < block_num; i++)
     {
-        std::cout << i << std::endl;
         char* page_start = bm.fetchPage(file_path, i);
         int offset = 0;
         while(offset < PAGESIZE && page_start[offset] != '#')
@@ -715,7 +714,7 @@ void BpTree<Key, Value>::read_from_disk_all()
             //Output for debug.
             //还没有将(key, value)插入树中，待下一个版本再补充
             //To be continued.
-            std::cout << "[debug]In BpTree::read_from_disk_all();Initializing " << "key: " << key << ", value: " << value << std::endl;
+            // std::cout << "[debug]In BpTree::read_from_disk_all();Initializing " << "key: " << key << ", value: " << value << std::endl;
             this->insert(key, value);
         }
     }
@@ -733,7 +732,7 @@ void BpTree<Key, Value>::write_back_to_disk_all()
     BpNode<Key, Value>* leaf_tmp = get_minNode();
     for (j = 0, i = 0; leaf_tmp != nullptr; j++)
     {
-        std::cout<<"Hello!"<<std::endl;
+        // std::cout<<"Hello!"<<std::endl;
         int offset = 0; //块内扫描地址偏移
         char* page_start = bm.fetchPage(file_path, j);
         memset(page_start, 0, PAGESIZE); //清空缓冲页
@@ -754,7 +753,7 @@ void BpTree<Key, Value>::write_back_to_disk_all()
         int page_id = bm.fetchPageID(file_path, j);
         bm.markPageDirty(page_id);
         //Output for debug.
-        if(offset > PAGESIZE) std::cout<<"[debug]In BpTree::write_back_to_disk_all();BpTree node too big! A single page cannot hold it."<<std::endl; //for debug
+        if(offset > PAGESIZE) std::cout<<"[debug]Error: In BpTree::write_back_to_disk_all();BpTree node too big! A single page cannot hold it."<<std::endl; //for debug
         leaf_tmp = leaf_tmp->ptrs[leaf_tmp->MAX_KEY];
     }
     //结束块，首字节也为'#'
@@ -776,7 +775,7 @@ int BpTree<Key, Value>::init_file(std::string file_path)
         fclose(f);
         f = fopen(file_path.c_str() , "r");
         fclose(f);
-        std::cout << "[debug]In BpTree::init_file();Index file should be created earlier!" << std::endl;
+        std::cout << "[debug]Warning: In BpTree::init_file();Index file should be created earlier!" << std::endl;
         return 0;
     }
     //否则确实存在这个文件
