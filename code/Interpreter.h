@@ -9,16 +9,18 @@ using namespace std;
 class Interpreter
 {
 public:
-	//API *api;
-	string filename;
-	//get the next word starting from index
-	string getWord (string s,int& index);
-	//执行语句s
-	int interpreter(string s);
-	//string转int，如果超出范围则返回0
-	int string2num(string s);
-	
-	Interpreter() {};
-	~Interpreter() {};
+    //API *api;
+    string filename;
+    //get the next word starting from index
+    //鎵ц璇彞s
+    int interpreter(string s);
+    Interpreter() {};
+    ~Interpreter() {};
+
+private:
+    string getWord (string s, int& index);
+    string getWord_no_symbol (string s, int& index);
+    //string杞琲nt锛屽鏋滆秴鍑鸿寖鍥村垯杩斿洖0
+    int string2num(string s);
 };
 #endif;
