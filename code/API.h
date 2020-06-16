@@ -64,6 +64,8 @@ public:
     void insertIndex(string index_name, char* key_addr, int type, int blockID);
     void deleteRecordIndex(char* record_begin, int record_size, Attribute attributes, int blockID);
     void insertRecordIndex(char* record_begin, int record_size, Attribute attributes, int blockID);
+    //获得所有index的信息：<index文件名，index的type> -- 在Index_Manager.cpp中用于初始化所有index文件
+    vector<pair<string, int>> allIndexInfoGet();
     //To be continued.
 };
 

@@ -117,16 +117,23 @@ void API::dropIndex(string table_name, string index_name)
 
 //以下3个内部函数还没有开始写
 //To be continued.
-void insertIndex(string index_name, char* key_addr, int type, int blockID)
+void API::insertIndex(string index_name, char* key_addr, int type, int blockID)
 {
 
 }
-void deleteRecordIndex(char* record_begin, int record_size, Attribute attributes, int blockID)
+void API::deleteRecordIndex(char* record_begin, int record_size, Attribute attributes, int blockID)
 {
 
 }
-void insertRecordIndex(char* record_begin, int record_size, Attribute attributes, int blockID)
+void API::insertRecordIndex(char* record_begin, int record_size, Attribute attributes, int blockID)
 {
     
+}
+vector<pair<string, int>> API::allIndexInfoGet()
+{
+    vector<pair<string, int>> all_index_info;
+    //To be continued.
+    //需要catalog_manager增加接口，获取所有表名
+    return all_index_info;
 }
 /*Written by 谢廷浩 END*/
