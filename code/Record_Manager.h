@@ -2,22 +2,23 @@
 #ifndef _RECORD_MANAGER_H_
 #define _RECORD_MANAGER_H_
 #define _CRT_SECURE_NO_WARNINGS
+
 #include<iostream>
 #include<string>
 #include<vector>
 #include"Buffer_Manager.h"
 #include"Condition.h"
-#include"Attribute.h"
+#include"SingleAttribute.h"
 
-#define RECORDFILEPATH "./database/record"
-#define INDEXFILEPATH "./database/index"
+#define RECORDFILEPATH "./database/record/"
+#define INDEXFILEPATH "./database/index/"
 
 using namespace std;
 
 class RecordManager {
 public:
 	string getTableFileName(string tablename);
-	string getIndexFileName(string indexname);
+	string getIndexFileName(string tablename,string indexname);
 	//创建table时调用
 	//创建存储table对应的文件
 	//@tablename:table名称
