@@ -362,12 +362,12 @@ char* RecordManager::findFirstUsableBlock(string tablename) {
 	return beginBlock;
 }
 
-int RecordManager::findContentBegin(char* block_content) {
+int RecordManager::findContentBegin(char* block_content,int recordSize) {
 	int i = 0;
 	while (block_content[i] != '/0'&&i<PAGESIZE) {
-		i++;
+		i+=recordSize;
 	}
-	if (i == PAGESIZE) {
+	if (i >= PAGESIZE) {
 		return -1;
 	}
 	else {
