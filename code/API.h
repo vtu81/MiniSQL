@@ -61,9 +61,14 @@ public:
     /*一些内部函数，不应该被interpreter调用！
     可能会被API本身、catalog manager、record manager、index manager模块调用
     没有列全，用到时自行补足即可*/
-    void insertIndex(string index_name, char* key_addr, int type, int blockID);
-    void deleteRecordIndex(char* record_begin, int record_size, Attribute attributes, int blockID);
-    void insertRecordIndex(char* record_begin, int record_size, Attribute attributes, int blockID);
+    //内部函数，插入**单个数据**对应的索引
+    void insertIndex(string table_name, string index_name, char* key_addr, int type, int blockID);
+    //内部函数，删除**单个数据**对应的索引
+    void deleteIndex(string table_name, string index_name, char* key_addr, int type);
+    //内部函数，删除给定地址开始的**一条记录**对应的索引
+    void deleteRecordIndex(string table_name, char* record_begin, int record_size, Attribute attributes);
+    //内部函数，插入给定地址开始的**一条记录**对应的索引
+    void insertRecordIndex(string table_name, char* record_begin, int record_size, Attribute attributes, int blockID);
     //获得所有index的信息：<index文件名，index的type> -- 在Index_Manager.cpp中用于初始化所有index文件
     vector<pair<string, int>> allIndexInfoGet();
     //To be continued.
