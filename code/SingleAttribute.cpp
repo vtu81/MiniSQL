@@ -8,6 +8,14 @@ SingleAttribute::SingleAttribute(string n, int t, bool i) {
 
 }
 
+void SingleAttribute::SetIndex(string indexName) {
+	if (ifUnique == false) {
+		cout << "Not unique attribute!" << endl;
+		return;
+	}
+	index = indexName;
+}
+
 int SingleAttribute::getType() {
 	return type;
 }
