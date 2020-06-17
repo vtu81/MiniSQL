@@ -61,9 +61,9 @@ string RecordManager::getTableFileName(string tablename) {
 	return A;
 }
 
-string RecordManager::getIndexFileName(string indexname) {
+string RecordManager::getIndexFileName(string tablename,string indexname) {
 	string A;
-	A = INDEXFILEPATH + indexname;
+	A = INDEXFILEPATH + tablename+"_"+indexname;
 	return A;
 }
 
