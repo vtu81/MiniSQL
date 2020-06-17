@@ -57,6 +57,11 @@ public:
     //删除记录 -- 有条件
     void deleteRecord(string table_name, vector<Condition>* conditions);
     
+    //获取recordSize的函数
+	int recordSizeGet(string tableName);
+	//获取表中SingleAttribute的函数
+	int attributeGet(string tableName, vector<SingleAttribute> *attributeVector);
+    
     /*Internal function members below*/
     /*一些内部函数，不应该被interpreter调用！
     可能会被API本身、catalog manager、record manager、index manager模块调用
