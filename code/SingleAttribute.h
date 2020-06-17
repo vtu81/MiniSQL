@@ -28,6 +28,8 @@ public:
 	int getType();
 	//返回attribute大小
 	int getSize();
+	//设置index名称
+	void SetIndex(string indexName);
 	//返回index名称
 	string indexNameGet();
 
