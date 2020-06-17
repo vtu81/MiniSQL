@@ -4,7 +4,42 @@
 #include "Record_Manager.h"
 
 
+/*Written by 蒋雨舟 START*/
 
+int API::attributeGet(string tableName, vector<SingleAttribute> *attributeVector) {
+	if (!cm->IsTable(tableName)) {
+		return 0;
+	}
+	Attribute Attr_info = cm->GetAttribute(tableName);
+	int i;
+	for (i = 0; i < Attr_info.num; i++) {
+		SingleAttribute tmp = SingleAttribute(Attr_info.name[i], Attr_info.type[i], Attr_info.repeat[i]);
+		attributeVector->push_back(tmp);
+	}
+	return i;
+}
+
+int API::recordSizeGet(string tableName) {
+	if (!cm->IsTable) {
+		cout << "Table not exist" << endl;
+		return -1;
+	}
+	Attribute attr_info = cm->GetAttribute(tableName);
+	int recordSize = 0;
+	int i;
+	for (i = 0; i < attr_info.num; i++) {
+		if (attr_info.type[i] == -1) {
+			recordSize += sizeof(float);
+		}
+		else if (attr_info.type[i] == 0) {
+			recordSize += sizeof(int);
+		}
+		else {
+			recordSize += sizeof(char)*attr_info.type[i];
+		}
+	}
+}
+/*Written by 蒋雨舟 END*/
 
 /*Written by 谢廷浩 START*/
 //创建索引
