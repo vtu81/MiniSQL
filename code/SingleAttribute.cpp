@@ -1,6 +1,6 @@
-#include "Attribute.h"
+#include "SingleAttribute.h"
 
-Attribute::Attribute(string n, int t, bool i) {
+SingleAttribute::SingleAttribute(string n, int t, bool i) {
 	name = n;
 	type = t;
 	ifUnique = i;
@@ -8,15 +8,15 @@ Attribute::Attribute(string n, int t, bool i) {
 
 }
 
-int Attribute::getType() {
+int SingleAttribute::getType() {
 	return type;
 }
 
-string Attribute::indexNameGet() {
+string SingleAttribute::indexNameGet() {
 	return index;
 }
 
-int Attribute::getSize() {
+int SingleAttribute::getSize() {
 	if (type == TYPE_FLOAT) {
 		return sizeof(float);
 	}
