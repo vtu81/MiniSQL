@@ -102,7 +102,7 @@ int RecordManager::recordBlockShow(string tableFileName, vector<string>* attribu
 	}
 	else {
 		int count = 0;
-		vector<Attribute> attributeVector;
+		vector<SingleAttribute> attributeVector;
 		//需要调用函数获得一条record的大小，recordSizeGet()实际上调用了catalog manager的函数
 		int recordSize = api->recordSizeGet(tableName);
 		//将表中的attribute拷贝到attributeVector中
@@ -120,7 +120,7 @@ int RecordManager::recordBlockShow(string tableFileName, vector<string>* attribu
 	}
 }
 
-void RecordManager::recordPrint(char* recordBegin, int recordSize, vector<Attribute>* attributeVector, vector<string> *attributeNameVector)
+void RecordManager::recordPrint(char* recordBegin, int recordSize, vector<SingleAttribute>* attributeVector, vector<string> *attributeNameVector)
 {
 	int type;
 	string attributeName;
@@ -150,12 +150,12 @@ void RecordManager::recordPrint(char* recordBegin, int recordSize, vector<Attrib
 }
 
 void RecordManager::contentPrint(char* content, int type) {
-	if (type == Attribute::TYPE_INT)
+	if (type == SingleAttribute::TYPE_INT)
 	{
 		int tmp = *((int *)content); 
 		printf("%d ", tmp);
 	}
-	else if (type == Attribute::TYPE_FLOAT)
+	else if (type == SingleAttribute::TYPE_FLOAT)
 	{
 		float tmp = *((float *)content); 
 		printf("%f ", tmp);
@@ -184,7 +184,7 @@ int RecordManager::recordBlockFind(string tableFileName, vector<Condition>* cond
 	char* recordBegin = bm->fetchPage(tableFileName,pageID);
 	char* usingBegin=bm->fetchPage(tableFileName, pageID);
 	int usingSize = findContentBegin(usingBegin);
-	vector<Attribute> attributeVector;
+	vector<SingleAttribute> attributeVector;
 	int recordSize = api->recordSizeGet(tableName);
 
 	api->attributeGet(tableName, &attributeVector);
@@ -215,10 +215,10 @@ int RecordManager::recordAllDelete(string tableName, vector<Condition>* conditio
 
 int RecordManager::recordBlockDelete(string tableName, vector<Condition>* conditionVector, int pageID) {
 	int count = 0;
-	char* recordBegin = bm->fetchPage(tableFileName, pageID);
-	char* usingBegin = bm->fetchPage(tableFileName, pageID);
+	char* recordBegin = bm->fetchPage(tableName, pageID);
+	char* usingBegin = bm->fetchPage(tableName, pageID);
 	int usingSize = findContentBegin(usingBegin);
-	vector<Attribute> attributeVector;
+	vector<SingleAttribute> attributeVector;
 	int recordSize = api->recordSizeGet(tableName);
 
 	api->attributeGet(tableName, &attributeVector);
@@ -267,7 +267,7 @@ int RecordManager::indexRecordBlockAlreadyInsert(string tableName, string indexN
 	char* recordBegin = bm->fetchPage(tableFileName, blockID);
 	char* usingBegin = bm->fetchPage(tableFileName, blockID);
 	int usingSize = findContentBegin(usingBegin);
-	vector<Attribute> attributeVector;
+	vector<SingleAttribute> attributeVector;
 	int recordSize = api->recordSizeGet(tableName);
 
 	api->attributeGet(tableName, &attributeVector);
@@ -299,7 +299,7 @@ int RecordManager::indexRecordBlockAlreadyInsert(string tableName, string indexN
 	return count;
 }
 
-bool RecordManager::recordConditionFit(char* recordBegin, int recordSize, vector<Attribute>* attributeVector, vector<Condition>* conditionVector) {
+bool RecordManager::recordConditionFit(char* recordBegin, int recordSize, vector<SingleAttribute>* attributeVector, vector<Condition>* conditionVector) {
 	if (conditionVector == NULL) {
 		return true;
 	}
@@ -334,12 +334,12 @@ bool RecordManager::recordConditionFit(char* recordBegin, int recordSize, vector
 }
 
 bool RecordManager::contentConditionFit(char* content, int type, Condition* condition) {
-	if (type == Attribute::TYPE_INT)
+	if (type == SingleAttribute::TYPE_INT)
 	{
 		int tmp = *((int *)content);   
 		return condition->ifRight(tmp);
 	}
-	else if (type == Attribute::TYPE_FLOAT)
+	else if (type == SingleAttribute::TYPE_FLOAT)
 	{
 		float tmp = *((float *)content);  
 		return condition->ifRight(tmp);
