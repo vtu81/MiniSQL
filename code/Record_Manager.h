@@ -90,7 +90,7 @@ private:
 	void contentPrint(char* content, int type);
 
 	char* findFirstUsableBlock(string tablename);
-	int findContentBegin(char* block_content);
+	int findContentBegin(char* block_content,int recordSize);
 
 };
 
