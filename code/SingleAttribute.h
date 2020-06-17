@@ -6,7 +6,7 @@
 #include <iostream>
 using namespace std;
 
-class Attribute
+class SingleAttribute
 {
 public:
 	//属性名
@@ -18,7 +18,7 @@ public:
 	//初始值为""，即没有任何index
 	string index;      
 	//构造函数
-	Attribute(string n, int t, bool i);
+	SingleAttribute(string n, int t, bool i);
 
 public:
 	//定义不同类型对应的数
