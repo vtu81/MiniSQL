@@ -78,7 +78,7 @@ private:
 	//@recordSize:record的大小
 	//@attributeVector:指向一个包含record所有attribute的vector
 	//@conditionVector:指向一个包含所有condition的vector
-	bool recordConditionFit(char* recordBegin, int recordSize, vector<Attribute>* attributeVector, vector<Condition>* conditionVector);
+	bool recordConditionFit(char* recordBegin, int recordSize, vector<SingleAttribute>* attributeVector, vector<Condition>* conditionVector);
 	//检查一条record的某个attribute是否符合condition
 	//符合返回true,不符合返回false
 	//@content:指向record中某一attribute
@@ -86,7 +86,7 @@ private:
 	//@condition:指向某一个Condition类，即某一个条件
 	bool contentConditionFit(char* content, int type, Condition* condition);
 
-	void recordPrint(char* recordBegin, int recordSize, vector<Attribute>* attributeVector, vector<string> *attributeNameVector);
+	void recordPrint(char* recordBegin, int recordSize, vector<SingleAttribute>* attributeVector, vector<string> *attributeNameVector);
 	void contentPrint(char* content, int type);
 
 	char* findFirstUsableBlock(string tablename);
