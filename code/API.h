@@ -58,9 +58,9 @@ public:
     void deleteRecord(string table_name, vector<Condition>* conditions);
     
     //获取recordSize的函数
-	int recordSizeGet(string tableName);
-	//获取表中SingleAttribute的函数
-	int attributeGet(string tableName, vector<SingleAttribute> *attributeVector);
+    int recordSizeGet(string tableName);
+    //获取表中SingleAttribute的函数
+    int attributeGet(string tableName, vector<SingleAttribute> *attributeVector);
     
     /*Internal function members below*/
     /*一些内部函数，不应该被interpreter调用！
