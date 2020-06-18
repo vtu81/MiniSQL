@@ -9,6 +9,9 @@
 #include"Buffer_Manager.h"
 #include"Condition.h"
 #include"SingleAttribute.h"
+#include"Catalog_Manager.h"
+#include"API.h"
+#include"basic.h"
 
 #define RECORDFILEPATH "./database/record/"
 #define INDEXFILEPATH "./database/index/"
@@ -30,11 +33,11 @@ public:
 	//创建index调用
 	//创建存储index的对应文件
 	//@indexname:index名称
-	int createIndex(string indexname);
+	int createIndex(string tableName,string indexname);
 	//删除index时调用
 	//output所有buffer中的block并删除磁盘文件
 	//@indexname:索引名称
-	int dropIndex(string indexname);
+	int dropIndex(string tableName,string indexname);
 
 	//插入一条record
 	//将record写入buffer中的page并设置page为dirty
@@ -67,6 +70,8 @@ public:
 private:
 	
 	BufferManager *bm;
+	CatalogManager *cm;
+	API *api;
 	int recordBlockShow(string tableFileName, vector<string>* attributeNameVector, vector<Condition>* conditionVector, int pageID);
 	int recordBlockFind(string tableName, vector<Condition>* conditionVector, int pageID);
 	int recordBlockDelete(string tableName, vector<Condition>* conditionVector, int pageID);
