@@ -26,6 +26,12 @@ private:
     可能会被API本身、catalog manager、record manager、index manager模块调用
     没有列全，用到时自行补足即可*/
     //To be continued.
+    
+    //tableName:表名称
+    //recordContent:记录record中实际内容
+    //recordResult:用于存储一条record内容的指针
+    //将recordContent中的内容转为一个char*指向的内容，之后recordResult指针会作为其它函数参数
+	void recordStringGet(string tableName, vector<string>* recordContent, char* recordResult);
 public:
     /*下面3个指针在main模块中才初始化，避免和3个manager产生冲突*/
     //指向全局catalog manager的指针
@@ -61,6 +67,7 @@ public:
     int recordSizeGet(string tableName);
     //获取表中SingleAttribute的函数
     int attributeGet(string tableName, vector<SingleAttribute> *attributeVector);
+
     
     /*Internal function members below*/
     /*一些内部函数，不应该被interpreter调用！
