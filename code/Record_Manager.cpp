@@ -86,16 +86,18 @@ int RecordManager::recordAllShow(string tableName, vector<string>* attributeName
 	string TableFileName = getTableFileName(tableName);
 	int count = 0;
 	char* contentBegin = bm->fetchPage(TableFileName.c_str(), 0);
+	int recordSize = api->recordSizeGet(tableName);
 	while (contentBegin[0] != '/0') {
 		count++;
 		contentBegin = bm->fetchPage(TableFileName.c_str(), count);
-		recordBlockShow(contentBegin,attributeNameVector,conditionVector,count);
+		recordBlockShow(tableName,attributeNameVector,conditionVector,count);
 	}
 	return count;
 
 }
 
-int RecordManager::recordBlockShow(string tableFileName, vector<string>* attributeNameVector, vector<Condition>* conditionVector, int pageID) {
+int RecordManager::recordBlockShow(string table_name, vector<string>* attributeNameVector, vector<Condition>* conditionVector, int pageID) {
+	string tableFileName = getTableFileName(table_name);
 	char* recordBegin = bm->fetchPage(tableFileName, pageID);
 	if (recordBegin[0] = '/0') {
 		return -1;
@@ -103,14 +105,13 @@ int RecordManager::recordBlockShow(string tableFileName, vector<string>* attribu
 	else {
 		int count = 0;
 		vector<SingleAttribute> attributeVector;
-		//需要调用函数获得一条record的大小，recordSizeGet()实际上调用了catalog manager的函数
-		int recordSize = api->recordSizeGet(tableName);
+		int recordSize = api->recordSizeGet(table_name);
 		//将表中的attribute拷贝到attributeVector中
-		api->attributeGet(tableName, &attributeVector);
-		int usingSize = findContentBegin(recordBegin);
+		api->attributeGet(table_name, &attributeVector);
+		int usingSize = findContentBegin(recordBegin,recordSize);
 		char* usingBegin = bm->fetchPage(tableFileName, pageID);
 		while (recordBegin - usingBegin < usingSize) {
-			if (recordConditionFit(recordBegin, recordSize, &attributeVector, conditonVector)) {
+			if (recordConditionFit(recordBegin, recordSize, &attributeVector, conditionVector)) {
 				count++;
 				recordPrint(recordBegin, recordSize, &attributeVector, attributeNameVector));
 				printf("\n");
@@ -172,23 +173,22 @@ int RecordManager::recordAllFind(string tableName, vector<Condition>* conditionV
 	string TableFileName = getTableFileName(tableName);
 	char* recordBegin = bm->fetchPage(TableFileName,i);
 	while (recordBegin[0] != '\0') {
-		recordBlockFind(TableFileName, conditionVector, i);
+		recordBlockFind(tableName, conditionVector, i);
 		i++;
 		recordBegin = bm->fetchPage(TableFileName, i);
 	}
 	return i;
 }
 
-int RecordManager::recordBlockFind(string tableFileName, vector<Condition>* conditionVector, int pageID) {
+int RecordManager::recordBlockFind(string tableName, vector<Condition>* conditionVector, int pageID) {
 	int count = 0;
+	string tableFileName = getTableFileName(tableName);
+	int recordSize = api->recordSizeGet(tableName);
 	char* recordBegin = bm->fetchPage(tableFileName,pageID);
 	char* usingBegin=bm->fetchPage(tableFileName, pageID);
-	int usingSize = findContentBegin(usingBegin);
+	int usingSize = findContentBegin(usingBegin,recordSize);
 	vector<SingleAttribute> attributeVector;
-	int recordSize = api->recordSizeGet(tableName);
-
 	api->attributeGet(tableName, &attributeVector);
-
 	while (recordBegin - usingBegin < usingSize)
 	{
 		if (recordConditionFit(recordBegin, recordSize, &attributeVector, conditionVector))
@@ -206,7 +206,7 @@ int RecordManager::recordAllDelete(string tableName, vector<Condition>* conditio
 	string TableFileName = getTableFileName(tableName);
 	char* recordBegin = bm->fetchPage(TableFileName, i);
 	while (recordBegin[0] != '\0') {
-		recordBlockDelete(TableFileName, conditionVector, i);
+		recordBlockDelete(tableName, conditionVector, i);
 		i++;
 		recordBegin = bm->fetchPage(TableFileName, i);
 	}
@@ -214,22 +214,23 @@ int RecordManager::recordAllDelete(string tableName, vector<Condition>* conditio
 }
 
 int RecordManager::recordBlockDelete(string tableName, vector<Condition>* conditionVector, int pageID) {
+	string tableFileName = getTableFileName(tableName);
+	int recordSize = api->recordSizeGet(tableName);
 	int count = 0;
-	char* recordBegin = bm->fetchPage(tableName, pageID);
-	char* usingBegin = bm->fetchPage(tableName, pageID);
+	char* recordBegin = bm->fetchPage(tableFileName, pageID);
+	char* usingBegin = bm->fetchPage(tableFileName, pageID);
 	int usingSize = findContentBegin(usingBegin);
 	vector<SingleAttribute> attributeVector;
-	int recordSize = api->recordSizeGet(tableName);
 
 	api->attributeGet(tableName, &attributeVector);
-
+	Attribute tableAttribute = cm->GetAttribute(tableName);
 	while (recordBegin - usingBegin < usingSize)
 	{
 		if (recordConditionFit(recordBegin, recordSize, &attributeVector, conditionVector))
 		{
 			count++;
 
-			api->recordIndexDelete(recordBegin, recordSize, &attributeVector, block->offsetNum);
+			api->deleteRecordIndex(tableName, recordBegin, recordSize, tableAttribute);
 			int i = 0;
 			for (i = 0; i + recordSize + recordBegin - usingBegin< usingSize; i++)
 			{
@@ -263,13 +264,12 @@ int RecordManager::indexRecordAllAlreadyInsert(string tableName, string indexNam
 int RecordManager::indexRecordBlockAlreadyInsert(string tableName, string indexName, int blockID) {
 	int count = 0;
 	string tableFileName = getTableFileName(tableName);
-
+    int recordSize = api->recordSizeGet(tableName);
 	char* recordBegin = bm->fetchPage(tableFileName, blockID);
 	char* usingBegin = bm->fetchPage(tableFileName, blockID);
-	int usingSize = findContentBegin(usingBegin);
+	int usingSize = findContentBegin(usingBegin,recordSize);
 	vector<SingleAttribute> attributeVector;
-	int recordSize = api->recordSizeGet(tableName);
-
+	
 	api->attributeGet(tableName, &attributeVector);
 
 	int type;
@@ -282,12 +282,14 @@ int RecordManager::indexRecordBlockAlreadyInsert(string tableName, string indexN
 		for (int i = 0; i < attributeVector.size(); i++)
 		{
 			type = attributeVector[i].type;
-			typeSize = api->typeSizeGet(type);
+			if (type == SingleAttribute::TYPE_FLOAT) typeSize = sizeof(float);
+			else if (type == SingleAttribute::TYPE_INT) typeSize = sizeof(int);
+			else typeSize = sizeof(char)*type;
 
 			if (attributeVector[i].index == indexName)
 			{
 				//这里有一个insert index的函数，判断type在api中完成，然后再调用im函数进行insert
-				api->indexInsert(indexName, contentBegin, type, block->offsetNum);
+				api->insertRecordIndex(contentBegin, recordSize,attributeVector[i],blockID);
 				count++;
 			}
 
