@@ -5,7 +5,46 @@
 
 
 /*Written by 蒋雨舟 START*/
+void API::showRecord(string table_name, vector<string>* attribute_names) {
+	if (!cm->IsTable(table_name)) {
+		cout << "Table doesn't exist!" << endl;
+		return;
+	}
+	vector<Condition> conditions;
+	if (attribute_names == NULL) {
+		Attribute temp = cm->GetAttribute(table_name);
+		int i;
+		for (i = 0; i < temp.num; i++) {
+			attribute_names->push_back(temp.name[i].c_str());
+		}
+	}
+	for (int j = 0; j < attribute_names->size(); j++) {
+		printf("%s", attribute_names[j]);
+		printf(" ");
+	}
+	printf("\n");
+	rm->recordAllShow(table_name, attribute_names, &conditions);
+}
 
+void API::showRecord(string table_name, vector<string>* attribute_names, vector<Condition>* conditions) {
+	if (!cm->IsTable(table_name)) {
+		cout << "Table doesn't exist!" << endl;
+		return;
+	}
+	if (attribute_names == NULL) {
+		Attribute temp = cm->GetAttribute(table_name);
+		int i;
+		for (i = 0; i < temp.num; i++) {
+			attribute_names->push_back(temp.name[i].c_str());
+		}
+	}
+	for (int j = 0; j < attribute_names->size(); j++) {
+		printf("%s", attribute_names[j]);
+		printf(" ");
+	}
+	printf("\n");
+	rm->recordAllShow(table_name, attribute_names, conditions);
+}
 int API::attributeGet(string tableName, vector<SingleAttribute> *attributeVector) {
 	if (!cm->IsTable(tableName)) {
 		return 0;
