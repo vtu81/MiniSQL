@@ -52,6 +52,7 @@ void API::insertRecord(string table_name, vector<string>* record_content) {
 		return;
 	}
 	string indexName;
+	Attribute tableAttribute = cm->GetAttribute(table_name);
 	vector<SingleAttribute> attributeVector;
 	vector<Condition> conditionVector;
 	attributeGet(table_name, &attributeVector);
@@ -96,7 +97,7 @@ void API::insertRecord(string table_name, vector<string>* record_content) {
 
 	if (blockOffset >= 0)
 	{
-		insertRecordIndex(recordString, recordSize, &attributeVector, blockOffset);
+		insertRecordIndex(table_name,recordString, recordSize, tableAttribute, blockOffset);
 		printf("insert record into table %s successful\n", table_name.c_str());
 	}
 	else
@@ -105,12 +106,12 @@ void API::insertRecord(string table_name, vector<string>* record_content) {
 	}
 }
 
-void deleteRecord(string table_name) {
+void API::deleteRecord(string table_name) {
 	vector<Condition> conditionVector;
 	deleteRecord(table_name,& conditionVector);
 }
 
-void deleteRecord(string table_name, vector<Condition>* conditions) {
+void API::deleteRecord(string table_name, vector<Condition>* conditions) {
 	if (!cm->IsTable(table_name)) {
 		cout << "No such table" << endl;
 		return;
