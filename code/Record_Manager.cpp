@@ -28,8 +28,8 @@ int RecordManager::dropTable(string tablename) {
 	remove(TableFileName.c_str());
 }
 
-int RecordManager::createIndex(string indexname) {
-	string filename = getIndexFileName(indexname);
+int RecordManager::createIndex(string tableName,string indexname) {
+	string filename = getIndexFileName(tableName,indexname);
 	FILE* fp;
 	fp = fopen(filename.c_str(), "w+");
 	if (fp == NULL) {
@@ -42,8 +42,8 @@ int RecordManager::createIndex(string indexname) {
 	}
 }
 
-int RecordManager::dropIndex(string indexname) {
-	string IndexFileName = getIndexFileName(indexname);
+int RecordManager::dropIndex(string tableName,string indexname) {
+	string IndexFileName = getIndexFileName(tableName,indexname);
 	int i = 0;
 	int PageID = bm->fetchPageID(IndexFileName.c_str(), i);
 	while (PageID != PAGENOTEXIST) {
@@ -71,11 +71,11 @@ int RecordManager::recordInsert(string tablename, char* record, int recordSize) 
 	int i = 0;
 	string TableFileName = getTableFileName(tablename);
 	char * firstUsableBlock=bm->fetchPage(TableFileName,i);
-	int contentBegin = findContentBegin(firstUsableBlock);
+	int contentBegin = findContentBegin(firstUsableBlock,recordSize);
 	while (contentBegin + recordSize > PAGESIZE) {
 		i++;
 		firstUsableBlock = bm->fetchPage(TableFileName, i);
-		contentBegin = findContentBegin(firstUsableBlock);
+		contentBegin = findContentBegin(firstUsableBlock,recordSize);
 	}
 	memcpy(firstUsableBlock+contentBegin, record, recordSize);
 	bm->markPageDirty(i);
@@ -113,7 +113,7 @@ int RecordManager::recordBlockShow(string table_name, vector<string>* attributeN
 		while (recordBegin - usingBegin < usingSize) {
 			if (recordConditionFit(recordBegin, recordSize, &attributeVector, conditionVector)) {
 				count++;
-				recordPrint(recordBegin, recordSize, &attributeVector, attributeNameVector));
+				recordPrint(recordBegin, recordSize, &attributeVector, attributeNameVector);
 				printf("\n");
 			}
 			recordBegin += recordSize;
@@ -219,7 +219,7 @@ int RecordManager::recordBlockDelete(string tableName, vector<Condition>* condit
 	int count = 0;
 	char* recordBegin = bm->fetchPage(tableFileName, pageID);
 	char* usingBegin = bm->fetchPage(tableFileName, pageID);
-	int usingSize = findContentBegin(usingBegin);
+	int usingSize = findContentBegin(usingBegin,recordSize);
 	vector<SingleAttribute> attributeVector;
 
 	api->attributeGet(tableName, &attributeVector);
@@ -269,6 +269,7 @@ int RecordManager::indexRecordBlockAlreadyInsert(string tableName, string indexN
 	char* usingBegin = bm->fetchPage(tableFileName, blockID);
 	int usingSize = findContentBegin(usingBegin,recordSize);
 	vector<SingleAttribute> attributeVector;
+	Attribute tableAttribute = cm->GetAttribute(tableName);
 	
 	api->attributeGet(tableName, &attributeVector);
 
@@ -289,7 +290,7 @@ int RecordManager::indexRecordBlockAlreadyInsert(string tableName, string indexN
 			if (attributeVector[i].index == indexName)
 			{
 				//这里有一个insert index的函数，判断type在api中完成，然后再调用im函数进行insert
-				api->insertRecordIndex(contentBegin, recordSize,attributeVector[i],blockID);
+				api->insertRecordIndex(tableName,contentBegin,recordSize, tableAttribute,blockID);
 				count++;
 			}
 
