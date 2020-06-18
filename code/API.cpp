@@ -45,6 +45,111 @@ void API::showRecord(string table_name, vector<string>* attribute_names, vector<
 	printf("\n");
 	rm->recordAllShow(table_name, attribute_names, conditions);
 }
+
+void API::insertRecord(string table_name, vector<string>* record_content) {
+	if (!cm->IsTable(table_name)) {
+		cout << "No such table" << endl;
+		return;
+	}
+	string indexName;
+	vector<SingleAttribute> attributeVector;
+	vector<Condition> conditionVector;
+	attributeGet(table_name, &attributeVector);
+	for (int i = 0; i < attributeVector.size(); i++) {
+		indexName = attributeVector[i].indexNameGet;
+		if (indexName != "") {
+			int blockoffest = im->searchIndex(rm->getIndexFileName(indexName), (*record_content)[i], attributeVector[i].type);
+			if (blockoffest != -1)
+			{
+				cout << "insert fail because index value exist" << endl;
+				return;
+			}
+		}
+		else if (attributeVector[i].ifUnique)
+		{
+			Condition condition(attributeVector[i].name, (*record_content)[i], Condition::OPERATOR_EQUAL);
+			conditionVector.insert(conditionVector.end(), condition);
+		}
+	}
+	if (conditionVector.size() > 0)
+	{
+		for (int i = 0; i < conditionVector.size(); i++) {
+			vector<Condition> conditionTmp;
+			conditionTmp.insert(conditionTmp.begin(), conditionVector[i]);
+
+			int recordConflictNum = rm->recordAllFind(table_name, &conditionTmp);
+			if (recordConflictNum > 0) {
+				cout << "insert fail because unique value exist" << endl;
+				return;
+			}
+
+		}
+	}
+
+	char recordString[2000];
+	memset(recordString, 0, 2000);
+
+	recordStringGet(table_name, record_content, recordString);
+
+	int recordSize =recordSizeGet(table_name);
+	int blockOffset = rm->recordInsert(table_name, recordString, recordSize);
+
+	if (blockOffset >= 0)
+	{
+		insertRecordIndex(recordString, recordSize, &attributeVector, blockOffset);
+		printf("insert record into table %s successful\n", table_name.c_str());
+	}
+	else
+	{
+		cout << "insert record into table " << table_name << " fail" << endl;
+	}
+}
+
+void deleteRecord(string table_name) {
+	vector<Condition> conditionVector;
+	deleteRecord(table_name,& conditionVector);
+}
+
+void deleteRecord(string table_name, vector<Condition>* conditions) {
+	if (!cm->IsTable(table_name)) {
+		cout << "No such table" << endl;
+		return;
+	}
+	int num = 0;
+	vector<SingleAttribute> attributeVector;
+	attributeGet(table_name,&attributeVector);
+
+	int blockOffset = -1;
+	if (conditions != NULL)
+	{
+		for (Condition condition : *conditions)
+		{
+			if (condition.operate == Condition::OPERATOR_EQUAL)
+			{
+				for (SingleAttribute attribute : attributeVector)
+				{
+					if (attribute.index != "" && attribute.name == condition.attributeName)
+					{
+						blockOffset = im->searchIndex(rm->getIndexFileName(attribute.index), condition.value, attribute.type);
+
+					}
+				}
+			}
+		}
+	}
+
+	if (blockOffset == -1)
+	{
+		num = rm->recordAllDelete(table_name, conditions);
+	}
+	else
+	{
+		num = rm->recordBlockDelete(table_name, conditions, blockOffset);
+	}
+
+	printf("delete %d record in table %s\n", num, table_name.c_str());
+}
+
 int API::attributeGet(string tableName, vector<SingleAttribute> *attributeVector) {
 	if (!cm->IsTable(tableName)) {
 		return 0;
@@ -56,6 +161,39 @@ int API::attributeGet(string tableName, vector<SingleAttribute> *attributeVector
 		attributeVector->push_back(tmp);
 	}
 	return i;
+}
+
+void API::recordStringGet(string tableName, vector<string>* recordContent, char* recordResult) {
+	Attribute tableAttributes;
+	tableAttributes = cm->GetAttribute(tableName);
+	char* contentBegin = recordResult;
+	for (int i = 0; i < tableAttributes.num; i++) {
+		string content = (*recordContent)[i];
+		int type = tableAttributes.type[i];
+		int typeSize;
+		if (type == -1) typeSize = sizeof(float);
+		else if (type == 0) typeSize = sizeof(int);
+		else typeSize = sizeof(char)*type;
+		stringstream ss;
+		ss << content;
+		if (type == SingleAttribute::TYPE_INT)
+		{
+			int intTmp;
+			ss >> intTmp;
+			memcpy(contentBegin, ((char*)&intTmp), typeSize);
+		}
+		else if (type == SingleAttribute::TYPE_FLOAT)
+		{
+			float floatTmp;
+			ss >> floatTmp;
+			memcpy(contentBegin, ((char*)&floatTmp), typeSize);
+		}
+		else
+		{
+			memcpy(contentBegin, content.c_str(), typeSize);
+		}
+		contentBegin += typeSize;
+	}
 }
 
 int API::recordSizeGet(string tableName) {
