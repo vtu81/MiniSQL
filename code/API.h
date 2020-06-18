@@ -31,7 +31,7 @@ private:
     //recordContent:记录record中实际内容
     //recordResult:用于存储一条record内容的指针
     //将recordContent中的内容转为一个char*指向的内容，之后recordResult指针会作为其它函数参数
-	void recordStringGet(string tableName, vector<string>* recordContent, char* recordResult);
+    void recordStringGet(string tableName, vector<string>* recordContent, char* recordResult);
 public:
     /*下面3个指针在main模块中才初始化，避免和3个manager产生冲突*/
     //指向全局catalog manager的指针
