@@ -45,9 +45,9 @@ public:
     API(){};
     ~API(){};
     //创建表
-    void createTable(string table_name, Attribute attributes, string primary_key_name, int primary_key_location);
+    bool createTable(std::string table_name, Attribute attribute, int primary, Index index);
     //删除表
-    void dropTable(string table_name);
+    bool dropTable(std::string table_name);
     //创建索引
     void createIndex(string index_name, string table_name, string attribute_name);
     //删除索引
