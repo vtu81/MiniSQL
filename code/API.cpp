@@ -440,3 +440,21 @@ vector<pair<string, int>> API::allIndexInfoGet()
     return all_index_info;
 }
 /*Written by 谢廷浩 END*/
+
+
+/*start by 俞晓锋*/
+bool API::dropTable(std::string t_name)
+{
+	rm.dropTable(t_name);
+	cm.dropTable(t_name);
+
+	return true;
+}
+bool API::createTable(std::string t_name, Attribute attribute, int primary, Index index)
+{
+	rm.createTable(t_name);
+	cm.createTable(t_name, attribute, primary, index);
+
+	return true;
+}
+/*end by 俞晓锋*/
