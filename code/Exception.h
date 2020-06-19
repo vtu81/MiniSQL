@@ -35,12 +35,28 @@ public:
     }
 };
 //下面的异常为预期内的异常！主要在catalog_manager中抛出，在API中处理
-class table_exist{};
-class table_not_exist{};
-class attribute_not_exist{};
-class index_not_exist{};
-class index_full{};
-class index_exist{};
+class table_exist : public std::exception {
+
+};
+
+class table_not_exist : public std::exception {
+
+};
+
+class attribute_not_exist : public std::exception {
+
+};
+
+class index_exist : public std::exception {
+
+};
+
+class index_not_exist : public std::exception {
+
+};
+class index_full : public std::exception {
+
+};
 
 // interpreter出现的异常
 class multiple_tables{}; // 试图访问多个表
