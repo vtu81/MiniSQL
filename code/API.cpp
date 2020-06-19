@@ -108,7 +108,7 @@ void API::insertRecord(string table_name, vector<string>* record_content) {
 
 void API::deleteRecord(string table_name) {
 	vector<Condition> conditionVector;
-	deleteRecord(table_name,& conditionVector);
+	rm->recordAllDelete(table_name, &conditionVector);
 }
 
 void API::deleteRecord(string table_name, vector<Condition>* conditions) {
@@ -119,36 +119,13 @@ void API::deleteRecord(string table_name, vector<Condition>* conditions) {
 	int num = 0;
 	vector<SingleAttribute> attributeVector;
 	attributeGet(table_name,&attributeVector);
-
-	int blockOffset = -1;
-	if (conditions != NULL)
-	{
-		for (Condition condition : *conditions)
-		{
-			if (condition.operate == Condition::OPERATOR_EQUAL)
-			{
-				for (SingleAttribute attribute : attributeVector)
-				{
-					if (attribute.index != "" && attribute.name == condition.attributeName)
-					{
-						blockOffset = im->searchIndex(rm->getIndexFileName(table_name, attribute.index), condition.value, attribute.type);
-
-					}
-				}
-			}
-		}
+	if (conditions == NULL) {
+		num=rm->recordAllDelete(table_name, conditions);
+		return;
 	}
-
-	if (blockOffset == -1)
-	{
+        //暂时还未对删除index值的情况进行处理
 		num = rm->recordAllDelete(table_name, conditions);
-	}
-	else
-	{
-		num = rm->recordBlockDelete(table_name, conditions, blockOffset);
-	}
-
-	printf("delete %d record in table %s\n", num, table_name.c_str());
+		printf("delete %d record in table %s\n", num, table_name.c_str());
 }
 
 int API::attributeGet(string tableName, vector<SingleAttribute> *attributeVector) {
