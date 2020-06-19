@@ -66,6 +66,7 @@ public:
 	//@indexName:索引名
 	int indexRecordAllAlreadyInsert(string tableName, string indexName);
 
+	int recordBlockDelete(string tableName, vector<Condition>* conditionVector, int pageID);
 
 private:
 	
@@ -74,7 +75,6 @@ private:
 	API *api;
 	int recordBlockShow(string tableFileName, vector<string>* attributeNameVector, vector<Condition>* conditionVector, int pageID);
 	int recordBlockFind(string tableName, vector<Condition>* conditionVector, int pageID);
-	int recordBlockDelete(string tableName, vector<Condition>* conditionVector, int pageID);
 	int indexRecordBlockAlreadyInsert(string tableName, string indexName, int blockID);
 
 	//检查一条record是否符合conditionVector中的一系列条件
