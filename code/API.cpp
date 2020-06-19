@@ -158,7 +158,7 @@ int API::attributeGet(string tableName, vector<SingleAttribute> *attributeVector
 	Attribute Attr_info = cm->GetAttribute(tableName);
 	int i;
 	for (i = 0; i < Attr_info.num; i++) {
-		SingleAttribute tmp = SingleAttribute(Attr_info.name[i], Attr_info.type[i], Attr_info.repeat[i]);
+		SingleAttribute tmp = SingleAttribute(Attr_info.name[i], Attr_info.type[i], !Attr_info.repeat[i]);
 		attributeVector->push_back(tmp);
 	}
 	return i;
