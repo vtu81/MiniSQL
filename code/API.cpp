@@ -57,9 +57,9 @@ void API::insertRecord(string table_name, vector<string>* record_content) {
 	vector<Condition> conditionVector;
 	attributeGet(table_name, &attributeVector);
 	for (int i = 0; i < attributeVector.size(); i++) {
-		indexName = attributeVector[i].indexNameGet;
+		indexName = attributeVector[i].indexNameGet();
 		if (indexName != "") {
-			int blockoffest = im->searchIndex(rm->getIndexFileName(indexName), (*record_content)[i], attributeVector[i].type);
+			int blockoffest = im->searchIndex(rm->getIndexFileName(table_name, indexName), (*record_content)[i], attributeVector[i].type);
 			if (blockoffest != -1)
 			{
 				cout << "insert fail because index value exist" << endl;
@@ -131,7 +131,7 @@ void API::deleteRecord(string table_name, vector<Condition>* conditions) {
 				{
 					if (attribute.index != "" && attribute.name == condition.attributeName)
 					{
-						blockOffset = im->searchIndex(rm->getIndexFileName(attribute.index), condition.value, attribute.type);
+						blockOffset = im->searchIndex(rm->getIndexFileName(table_name, attribute.index), condition.value, attribute.type);
 
 					}
 				}
@@ -198,7 +198,7 @@ void API::recordStringGet(string tableName, vector<string>* recordContent, char*
 }
 
 int API::recordSizeGet(string tableName) {
-	if (!cm->IsTable) {
+	if (!cm->IsTable(tableName)) {
 		cout << "Table not exist" << endl;
 		return -1;
 	}
@@ -270,7 +270,7 @@ void API::createIndex(string index_name, string table_name, string attribute_nam
     }
 
     //初始化index文件
-    if(rm->createIndex(index_name) == -1)
+    if(rm->createIndex(table_name, index_name) == -1)
     {
         cout << "Cannot create index file on disk. Make sure file path ./database/index/ exists!" << endl;
         return;
@@ -323,7 +323,7 @@ void API::dropIndex(string table_name, string index_name)
     }
 
     //将index文件删除
-    rm->dropIndex(index_name);
+    rm->dropIndex(table_name, index_name);
     //
     im->dropIndex(rm->getIndexFileName(table_name, index_name), type);
     cout << "Drop index " << index_name << " on table " << table_name << " successfully!" << endl;
