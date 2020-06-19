@@ -10,6 +10,7 @@
 #include <cmath>
 #include <cstring>
 #include <iomanip>
+#include<vector>
 #include "Buffer_Manager.h"
 #include "Basic.h"
 #include "Exception.h"
@@ -82,6 +83,10 @@ public:
     output：if no such table，output error able_not_exist
 	*/
     void PrintTable(std::string t_name);
+	/*get the index of the table*/
+	Index GetIndex(std::string t_name);
+	/*Get all table name*/
+	void GetAllTable(std::vector<Attribute> &List);
 private:
     /*tranform numer to string，bit is width of number*/
     std::string numtostr(int num,short bit);
@@ -91,10 +96,11 @@ private:
     std::string GetTableName(std::string buffer,int start,int &rear);
     /*get the address of the table and return the block information */
     int GetTableAdress(std::string t_name,int &suitable_block);
-    /*get the index of the table*/
-    Index GetIndex(std::string t_name);
     /*get the size of the file*/
     int fetchBlockNum(std::string t_name);
+	/*get table information*/
+	Attribute tmp;
+	int tablenum = 0;
 };
 
 #endif
