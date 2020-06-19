@@ -6,29 +6,39 @@
 #include "catalog_manager.h"
 #include<cstring>
 
+
+void CatalogManager::GetAllTable(std::vector<Attribute> &List){
+    Attribute t;
+	t = tmp;
+	while(List.size()<tablenum)
+		List.push_back(t);
+
+}
+
 void CatalogManager::CreateTable(std::string name, Attribute Attr, int primary, Index index){
     //repeat error
     if(IsTable(name)){
         throw table_exist();
     }
+	tablenum++;
     Attr.repeat[primary]=true;
-    std::string str_tmp="0000 ";
-    str_tmp+=name;
-    str_tmp=str_tmp+" "+numtostr(Attr.num, 2);
+    std::string tempstring="0000 ";
+    tempstring+=name;
+    tempstring=tempstring+" "+numtostr(Attr.num, 2);
     //if repeat?
     for(int i=0;i<Attr.num;i++)
-        str_tmp=str_tmp+" "+numtostr(Attr.type[i], 3)+" "+Attr.name[i]+" "+(Attr.repeat[i]==true?"1":"0");
-    str_tmp=str_tmp+" "+numtostr(primary, 2);
+        tempstring=tempstring+" "+numtostr(Attr.type[i], 3)+" "+Attr.name[i]+" "+(Attr.repeat[i]==true?"1":"0");
+    tempstring=tempstring+" "+numtostr(primary, 2);
     //index number
-    str_tmp=str_tmp+" ;"+numtostr(index.num, 2);
+    tempstring=tempstring+" ;"+numtostr(index.num, 2);
     //index information
     for(int i=0;i<index.num;i++)
-        str_tmp=str_tmp+" "+numtostr(index.location[i], 2)+" "+index.indexname[i];
+        tempstring=tempstring+" "+numtostr(index.location[i], 2)+" "+index.indexname[i];
     //# represents end of each record
-    str_tmp=str_tmp+"\n"+"#";
+    tempstring=tempstring+"\n"+"#";
     //update record
-    std::string str_len=numtostr((int)str_tmp.length()-1, 4);
-    str_tmp=str_len+str_tmp.substr(4,str_tmp.length()-4);
+    std::string str_len=numtostr((int)tempstring.length()-1, 4);
+    tempstring=str_len+tempstring.substr(4,tempstring.length()-4);
     //number of block
     int blocknumber=fetchBlockNum(TABLEPATH)/PAGESIZE;
     //if block number =0
@@ -41,13 +51,13 @@ void CatalogManager::CreateTable(std::string name, Attribute Attr, int primary, 
         int length=0;
         for(length=0;length<PAGESIZE&&buffer[length]!='\0'&&buffer[length]!='#';length++){}
         //page size not overflow
-        if(length+(int)str_tmp.length()<PAGESIZE){
+        if(length+(int)tempstring.length()<PAGESIZE){
             if(length&&buffer[length-1]=='#')
                 buffer[length-1]='\0';
             else if(buffer[length]=='#')
                 buffer[length]='\0';
             
-            strcat(buffer , str_tmp.c_str());
+            strcat(buffer , tempstring.c_str());
             //mark the page and refresh
             BM.markPageDirty(page_id);
             return;
@@ -56,9 +66,9 @@ void CatalogManager::CreateTable(std::string name, Attribute Attr, int primary, 
     //build a new block for more space
     char* buffer = BM.fetchPage(TABLEPATH , blocknumber);
     int page_id = BM.fetchPageID(TABLEPATH , blocknumber);
-    strcat(buffer , str_tmp.c_str());
+    strcat(buffer , tempstring.c_str());
     BM.markPageDirty(page_id);
-    
+	tmp = Attr;
 }
 
 void CatalogManager::DropTable(std::string name){
