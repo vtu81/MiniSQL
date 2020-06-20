@@ -40,6 +40,8 @@ public:
     RecordManager *rm;
     //指向全局index manager的指针
     IndexManager *im;
+    //指向buffer manager的指针
+	BufferManager *bm;
 
     /*外部接口*/
     API(){};
