@@ -31,7 +31,7 @@ int SingleAttribute::getSize() {
 	else if (type == TYPE_INT) {
 		return sizeof(int);
 	}
-	else {
+	else
 		return sizeof(char)*type;
 }
 
