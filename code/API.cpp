@@ -452,16 +452,31 @@ vector<pair<string, int>> API::allIndexInfoGet()
 /*start by 俞晓锋*/
 bool API::dropTable(std::string t_name)
 {
-	rm->dropTable(t_name);
-	cm->DropTable(t_name);
-
+    try
+    {
+        rm->dropTable(t_name);
+	    cm->DropTable(t_name);
+    }
+    catch(table_not_exist e)
+    {
+        cout << "Table " << t_name << " not exists!" << endl;
+        return false;
+    }
 	return true;
 }
 bool API::createTable(std::string t_name, Attribute attribute, int primary, Index index)
 {
-	rm->createTable(t_name);
-	cm->CreateTable(t_name, attribute, primary, index);
-
+    try
+    {
+        rm->createTable(t_name);
+	    cm->CreateTable(t_name, attribute, primary, index);
+    }
+    catch(table_exist e)
+    {
+        cout << "Table " << t_name << " already exists!" << endl;
+        return false;
+    }
 	return true;
 }
 /*end by 俞晓锋*/
+
