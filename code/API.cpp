@@ -235,7 +235,7 @@ void API::createIndex(string index_name, string table_name, string attribute_nam
     try
     {
         //初始化catalog数据，并检测异常
-        cm->CreateIndex(index_name, table_name, attribute_name);
+        cm->CreateIndex(table_name, attribute_name, index_name);
     }
     catch(table_not_exist e)
     {
@@ -294,6 +294,19 @@ void API::createIndex(string index_name, string table_name, string attribute_nam
 //删除某个索引
 void API::dropIndex(string table_name, string index_name)
 {
+    //获得index对应的attribute名字
+    string attribute_name;
+    try
+    {
+        attribute_name = cm->IndextoAttr(table_name, index_name);
+    }
+    catch(index_not_exist e)
+    {
+        cout << "Index " << index_name << " on table " << table_name << " not exists!" << endl;
+        return;
+    }
+
+    //在catalog manager中删除index相关信息
     try
     {
         cm->DropIndex(table_name, index_name);
@@ -313,8 +326,7 @@ void API::dropIndex(string table_name, string index_name)
 
     //保存cm中获取的attribute信息
     Attribute attribute_info = cm->GetAttribute(table_name);
-    //获得index对应的attribute名字
-    string attribute_name = cm->IndextoAttr(table_name, index_name);
+    
     //保存该index对应的type
     int type = 0;
     for (int i = 0; i < attribute_info.num; i++)
