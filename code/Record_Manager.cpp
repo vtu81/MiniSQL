@@ -87,7 +87,7 @@ int RecordManager::recordAllShow(string tableName, vector<string>* attributeName
 	int count = 0;
 	char* contentBegin = bm->fetchPage(TableFileName.c_str(), 0);
 	int recordSize = api->recordSizeGet(tableName);
-	while (contentBegin[0] != '/0') {
+	while (contentBegin[0] != '\0') {
 		count++;
 		contentBegin = bm->fetchPage(TableFileName.c_str(), count);
 		recordBlockShow(tableName,attributeNameVector,conditionVector,count);
@@ -99,7 +99,7 @@ int RecordManager::recordAllShow(string tableName, vector<string>* attributeName
 int RecordManager::recordBlockShow(string table_name, vector<string>* attributeNameVector, vector<Condition>* conditionVector, int pageID) {
 	string tableFileName = getTableFileName(table_name);
 	char* recordBegin = bm->fetchPage(tableFileName, pageID);
-	if (recordBegin[0] = '/0') {
+	if (recordBegin[0] = '\0') {
 		return -1;
 	}
 	else {
@@ -250,7 +250,7 @@ int RecordManager::indexRecordAllAlreadyInsert(string tableName, string indexNam
 	int count = 0;
 	int i = 0;
 	char* recordBegin = bm->fetchPage(tableFileName,i);
-	while (recordBegin[0]!='/0')
+	while (recordBegin[0]!='\0')
 	{
 		int recordBlockNum = indexRecordBlockAlreadyInsert(tableName, indexName, i);
 		count += recordBlockNum;
@@ -358,7 +358,7 @@ char* RecordManager::findFirstUsableBlock(string tablename) {
 	string TableFileName=getTableFileName(tablename);
 	int i=0;
 	char* beginBlock=bm->fetchPage(TableFileName,i);
-	while (beginBlock[PAGESIZE - 1] != '/0') {
+	while (beginBlock[PAGESIZE - 1] != '\0') {
 		i++;
 		beginBlock=bm->fetchPage(TableFileName,i);
 	}
@@ -367,7 +367,7 @@ char* RecordManager::findFirstUsableBlock(string tablename) {
 
 int RecordManager::findContentBegin(char* block_content,int recordSize) {
 	int i = 0;
-	while (block_content[i] != '/0'&&i<PAGESIZE) {
+	while (block_content[i] != '\0'&&i<PAGESIZE) {
 		i+=recordSize;
 	}
 	if (i >= PAGESIZE) {
