@@ -92,7 +92,7 @@ int RecordManager::recordAllShow(string tableName, vector<string>* attributeName
 		contentBegin = bm->fetchPage(TableFileName.c_str(), count);
 		recordBlockShow(tableName,attributeNameVector,conditionVector,count);
 	}
-	return count;
+	return count-1;
 
 }
 
@@ -119,6 +119,7 @@ int RecordManager::recordBlockShow(string table_name, vector<string>* attributeN
 			recordBegin += recordSize;
 		}
 	}
+	return count-1;
 }
 
 void RecordManager::recordPrint(char* recordBegin, int recordSize, vector<SingleAttribute>* attributeVector, vector<string> *attributeNameVector)
@@ -177,7 +178,7 @@ int RecordManager::recordAllFind(string tableName, vector<Condition>* conditionV
 		i++;
 		recordBegin = bm->fetchPage(TableFileName, i);
 	}
-	return i;
+	return i-1;
 }
 
 int RecordManager::recordBlockFind(string tableName, vector<Condition>* conditionVector, int pageID) {
@@ -210,7 +211,7 @@ int RecordManager::recordAllDelete(string tableName, vector<Condition>* conditio
 		i++;
 		recordBegin = bm->fetchPage(TableFileName, i);
 	}
-	return i;
+	return i-1;
 }
 
 int RecordManager::recordBlockDelete(string tableName, vector<Condition>* conditionVector, int pageID) {
@@ -258,7 +259,7 @@ int RecordManager::indexRecordAllAlreadyInsert(string tableName, string indexNam
 		recordBegin = bm->fetchPage(tableFileName, i);
 	}
 
-	return count;;
+	return count;
 }
 
 int RecordManager::indexRecordBlockAlreadyInsert(string tableName, string indexName, int blockID) {
