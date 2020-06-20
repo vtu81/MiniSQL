@@ -431,10 +431,16 @@ void API::insertRecordIndex(string table_name, char* record_begin, int record_si
         tmp += size;
     }
 }
-//Index Manager用到的内部函数，获取所有index的信息：<index名称，index数据类型>
+//Index Manager用到的内部函数，获取所有index的信息：<index文件名，index数据类型>
 vector<pair<string, int>> API::allIndexInfoGet()
 {
     vector<pair<string, int>> all_index_info;
+    vector<Attribute> all_table_list;
+    cm->GetAllTable(all_table_list);
+    for(auto &i: all_table_list)
+    {
+        //获取表名
+    }
     //To be continued.
     //需要catalog_manager增加接口，获取所有表名
     return all_index_info;
@@ -445,15 +451,15 @@ vector<pair<string, int>> API::allIndexInfoGet()
 /*start by 俞晓锋*/
 bool API::dropTable(std::string t_name)
 {
-	rm.dropTable(t_name);
-	cm.dropTable(t_name);
+	rm->dropTable(t_name);
+	cm->DropTable(t_name);
 
 	return true;
 }
 bool API::createTable(std::string t_name, Attribute attribute, int primary, Index index)
 {
-	rm.createTable(t_name);
-	cm.createTable(t_name, attribute, primary, index);
+	rm->createTable(t_name);
+	cm->CreateTable(t_name, attribute, primary, index);
 
 	return true;
 }
