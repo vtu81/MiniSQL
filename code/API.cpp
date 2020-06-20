@@ -462,6 +462,7 @@ bool API::dropTable(std::string t_name)
         cout << "Table " << t_name << " not exists!" << endl;
         return false;
     }
+    cout << "Create table " << t_name << " successfully!" << endl;
 	return true;
 }
 bool API::createTable(std::string t_name, Attribute attribute, int primary, Index index)
@@ -476,6 +477,7 @@ bool API::createTable(std::string t_name, Attribute attribute, int primary, Inde
         cout << "Table " << t_name << " already exists!" << endl;
         return false;
     }
+    cout << "Drop table " << t_name << " successfully!" << endl;
 	return true;
 }
 /*end by 俞晓锋*/
