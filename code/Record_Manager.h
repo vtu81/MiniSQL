@@ -67,6 +67,14 @@ public:
 	int indexRecordAllAlreadyInsert(string tableName, string indexName);
 
 	int recordBlockDelete(string tableName, vector<Condition>* conditionVector, int pageID);
+	
+	//检查一条record是否符合conditionVector中的一系列条件
+	//如果全部符合条件，返回true,否则返回false
+	//@recordBegin:指向record记录开始部分的指针
+	//@recordSize:record的大小
+	//@attributeVector:指向一个包含record所有attribute的vector
+	//@conditionVector:指向一个包含所有condition的vector
+	bool recordConditionFit(char* recordBegin, int recordSize, vector<SingleAttribute>* attributeVector, vector<Condition>* conditionVector);
 
 private:
 	
@@ -77,13 +85,7 @@ private:
 	int recordBlockFind(string tableName, vector<Condition>* conditionVector, int pageID);
 	int indexRecordBlockAlreadyInsert(string tableName, string indexName, int blockID);
 
-	//检查一条record是否符合conditionVector中的一系列条件
-	//如果全部符合条件，返回true,否则返回false
-	//@recordBegin:指向record记录开始部分的指针
-	//@recordSize:record的大小
-	//@attributeVector:指向一个包含record所有attribute的vector
-	//@conditionVector:指向一个包含所有condition的vector
-	bool recordConditionFit(char* recordBegin, int recordSize, vector<SingleAttribute>* attributeVector, vector<Condition>* conditionVector);
+	
 	//检查一条record的某个attribute是否符合condition
 	//符合返回true,不符合返回false
 	//@content:指向record中某一attribute
