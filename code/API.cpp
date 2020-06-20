@@ -193,6 +193,7 @@ int API::recordSizeGet(string tableName) {
 			recordSize += sizeof(char)*attr_info.type[i];
 		}
 	}
+    return recordSize;
 }
 /*Written by 蒋雨舟 END*/
 
