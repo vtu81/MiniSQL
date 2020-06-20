@@ -95,6 +95,8 @@ int Interpreter::interpreter(string s)
         word = getWord(temp, index);
         if (word.compare("table") == 0)
         {
+			Attribute table_attribute;
+			int num = 0;
             string tablename;
             string primaryKeyName;
             word = getWord(temp, index);
@@ -106,15 +108,15 @@ int Interpreter::interpreter(string s)
             else
             {
                 //没有表名
-                table_not_exist e;
-                throw e;
-//                return 0;
+                std::cout << "empty table!" << std::endl;
+//                table_not_exist e;
+//                throw e;
+                return 0;
             }
 
             word = getWord(temp, index);
-            if (temp.compare("(") == 0)
+            if (word.compare("(") == 0)
             {
-                vector<Attribute> attribute_list;
                 word = getWord(temp, index);
                 while (word.compare(")") != 0 && word.compare("primary") != 0 && word.compare("") != 0)
                 {
@@ -132,34 +134,38 @@ int Interpreter::interpreter(string s)
                         if (word.compare("(") != 0)
                         {
                             //char后没有(
-                            create_table_syntax_error e;
-                            throw e;
-//                            return 0;
+//                            create_table_syntax_error e;
+//                            throw e;
+                            std::cout << "create table syntax error!" << std::endl;
+                            return 0;
                         }
                         word = getWord(temp, index);
                         type = string2num(word);
                         if (type == 0)
                         {
                             //发生溢出即n不在1-255内
-                            char_size_overflow e;
-                            throw e;
-//                            return 0;
+//                            char_size_overflow e;
+//                            throw e;
+                            std::cout << "char size overflow!" << std::endl;
+                            return 0;
                         }
                         word = getWord(temp, index);
                         if (word.compare(")") != 0)
                         {
                             //char后没有(
-                            create_table_syntax_error e;
-                            throw e;
+//                            create_table_syntax_error e;
+//                            throw e;
+                            std::cout << "create table syntax error!" << std::endl;
                             return 0;
                         }
                     }
                     else
                     {
                         //未知类型
-                        unknown_data_type e;
-                        throw e;
-//                        return 0;
+//                        unknown_data_type e;
+//                        throw e;
+                        std::cout << "unknown data type" << std::endl;
+                        return 0;
                     }
                     //查看是否有unique
                     word = getWord(temp, index);
@@ -168,16 +174,19 @@ int Interpreter::interpreter(string s)
                         unique = true;
                         word = getWord(temp, index);
                     }
-                    Attribute temp_attribute(attribute_name, type, unique);
-                    attribute_list.push_back(temp_attribute);
+					table_attribute.name[num] = attribute_name;
+					table_attribute.type[num] = type;
+					table_attribute.repeat[num] = unique;
+					table_attribute.num = ++num;
                     if (word.compare(",") != 0)
                     {
                         if (word.compare(")") != 0)
                         {
                             //缺少,或)
-                            create_table_syntax_error e;
-                            throw e;
-//                            return 0;
+//                            create_table_syntax_error e;
+//                            throw e;
+                            std::cout << "create table syntax error!" << std::endl;
+                            return 0;
                         }
                         else break;
                     }
@@ -191,59 +200,72 @@ int Interpreter::interpreter(string s)
                     if (word.compare("key") != 0)
                     {
                         //primary后面没跟key
-                        create_table_syntax_error e;
-                        throw e;
-//                        return 0;
+//                        create_table_syntax_error e;
+//                        throw e;
+                        std::cout << "create table syntax error!" << std::endl;
+                        return 0;
                     }
                     word = getWord(temp, index);
                     if (word.compare("(") != 0)
                     {
                         //key后面没跟()
-                        create_table_syntax_error e;
-                        throw e;
-//                        return 0;
+//                        create_table_syntax_error e;
+//                        throw e;
+                        std::cout << "create table syntax error!" << std::endl;
+                        return 0;
                     }
+					word = getWord(temp, index);
                     //检查是否存在
                     int i;
-                    for (i = 0;i < attribute_list.size();i++)
+                    for (i = 0;i < num;i++)
                     {
-                        if (attribute_list[i].name == word)
-                            attribute_list[i].ifUnique == true;
+						if (table_attribute.name[i] == word)
+						{
+							table_attribute.repeat[i] = true;
+							break;
+						}
                     }
-                    if (i == attribute_list.size())
+                    if (i == num)
                     {
                         //主键属性不存在
-                        primary_key_not_exist e;
-                        throw e;
-//                        return 0;
+//                        primary_key_not_exist e;
+//                        throw e;
+                        std::cout << "primary key not exist!" << std::endl;
+                        return 0;
                     }
                     primaryKeyLocation = i;
-                    primaryKeyName = attribute_list[i].name;
+                    primaryKeyName = table_attribute.name[i];
                     word = getWord(temp, index);
                     if (word.compare(")") != 0)
                     {
                         //属性后面没跟)
-                        create_table_syntax_error e;
-                        throw e;
-//                        return 0;
+//                        create_table_syntax_error e;
+//                        throw e;
+                        std::cout << "create table syntax error!" << std::endl;
+                        return 0;
                     }
                     word = getWord(temp, index);
                 }
                 if (word.compare(")") != 0)
                 {
                     //缺少)
-                    create_table_syntax_error e;
-                    throw e;
-//                    return 0;
+//                    create_table_syntax_error e;
+//                    throw e;
+                    std::cout << "create table syntax error!" << std::endl;
+                    return 0;
                 }
+				Index table_index;
+				table_index.num = 0;
                 //连接api
-                /*api->tableCreate(tablename, &attribute_list, primaryKeyName, primaryKeyLocation);*/
+                api->createTable(tablename, table_attribute, primaryKeyLocation, table_index);
             }
             else
             {
                 //如果没有出现(
-                create_table_syntax_error e;
-                throw e;
+                std::cout << "create table synxtax error!" << std::endl;
+                return 0;
+//                create_table_syntax_error e;
+//                throw e;
 //                return 0;
             }
         }
@@ -257,45 +279,60 @@ int Interpreter::interpreter(string s)
             else
             {
                 //没有索引名
-                index_not_exist e;
-                throw e;
-//                return 0;
+//                index_not_exist e;
+//                throw e;
+                std::cout << "index not exist error!" << std::endl;
+                return 0;
             }
             word = getWord(temp, index);
             if (word.compare("on") != 0)
             {
                 //缺少on
-                create_index_syntax_error e;
-                throw e;
-//                return 0;
+//                create_index_syntax_error e;
+//                throw e;
+                std::cout << "create index syntax error!" << std::endl;
+                return 0;
             }
             word = getWord(temp, index);
+			if (word.compare("") == 0)
+			{
+				//插入index没有对应属性
+//                create_index_syntax_error e;
+//                throw e;
+				std::cout << "create index syntax error!" << std::endl;
+				return 0;
+			}
+			else table_name = word;
+			word = getWord(temp, index);
             if (word.compare("(") != 0)
             {
                 //on后面缺少(
-                create_index_syntax_error e;
-                throw e;
-//                return 0;
+//                create_index_syntax_error e;
+//                throw e;
+                std::cout << "create index syntax error!" << std::endl;
+                return 0;
             }
             word = getWord(temp, index);
             if (word.compare("") == 0)
             {
                 //插入index没有对应属性
-                create_index_syntax_error e;
-                throw e;
-//                return 0;
+//                create_index_syntax_error e;
+//                throw e;
+                std::cout << "create index syntax error!" << std::endl;
+                return 0;
             }
             else attribute_name = word;
             word = getWord(temp, index);
             if (word.compare(")") != 0)
             {
                 //缺少)
-                create_index_syntax_error e;
-                throw e;
-//                return 0;
+//                create_index_syntax_error e;
+//                throw e;
+                std::cout << "create index syntax error!" << std::endl;
+                return 0;
             }
             //引用api创建index
-            //
+			api->createIndex(index_name, table_name, attribute_name);
         }
         else
         {
@@ -312,29 +349,52 @@ int Interpreter::interpreter(string s)
             if (word.compare("") == 0)
             {
                 //删除时缺省表名
-                table_not_exist e;
-                throw e;
-//                return 0;
+//                table_not_exist e;
+//                throw e;
+                std::cout << "empty table!" << std::endl;
+                return 0;
             }
             else
             {
-                //调用api函数删除表
+				api->dropTable(word);
             }
         }
         else if (word.compare("index") == 0)
         {
-            word = getWord(temp, index);
-            if (word.compare("") == 0)
-            {
-                index_not_exist e;
-                throw e;
-                //删除时缺省表名
-//                return 0;
-            }
-            else
-            {
-                //调用api函数删除索引
-            }
+			string table_name,index_name,
+			word = getWord(temp, index);
+			//创建索引的名字
+			if (!word.empty())
+				index_name = word;
+			else
+			{
+				//没有索引名
+//                index_not_exist e;
+//                throw e;
+				std::cout << "index not exist error!" << std::endl;
+				return 0;
+			}
+			word = getWord(temp, index);
+			if (word.compare("on") != 0)
+			{
+				//缺少on
+//                create_index_syntax_error e;
+//                throw e;
+				std::cout << "create index syntax error!" << std::endl;
+				return 0;
+			}
+			word = getWord(temp, index);
+			if (word.compare("") == 0)
+			{
+				//插入index没有对应属性
+//                create_index_syntax_error e;
+//                throw e;
+				std::cout << "create index syntax error!" << std::endl;
+				return 0;
+			}
+			else table_name = word;
+			//删除索引
+			 api->dropIndex(table_name, index_name);
         }
         else
         {
@@ -342,203 +402,333 @@ int Interpreter::interpreter(string s)
             return 0;
         }
     }
-    else if (word.compare("select") == 0)
-    { /* 处理select句段 */
-        word = getWord_no_symbol(temp, index);
-        auto* select_attribute_name_list = new vector<string>(); // 被选择的属性数组，储存的是名字
-        string table_name = ""; // 选择的表格名称
-        if (word.compare("*") == 0)
-        { // 全选
-            // 全选由API实现，把属性指针置为nullptr即可
-            select_attribute_name_list = nullptr;
-            do
-            { // 忽略后面出现的属性，找到from语句
-                word = getWord_no_symbol(temp, index);
-            }
-            while (word.compare("from") != 0);
-        }
-        else // select后面出现其他属性
-        {
-            do
-            { // 添加属性
-                select_attribute_name_list->push_back(word);
-                word = getWord_no_symbol(temp, index);
-            }
-            while (word.compare("from") != 0);
-        }
-        word = getWord_no_symbol(temp, index);
-        /* 结束select处理 */
+	else if (word.compare("select") == 0)
+	{
+	//处理select句段 
+	word = getWord_no_symbol(temp, index);
+	auto* select_attribute_name_list = new vector<string>(); // 被选择的属性数组，储存的是名字
+	string table_name = ""; // 选择的表格名称
+	if (word.compare("*") == 0)
+	{ // 全选
+		// 全选由API实现，把属性指针置为nullptr即可
+		select_attribute_name_list = nullptr;
+		do
+		{ // 忽略后面出现的属性，找到from语句
+			word = getWord_no_symbol(temp, index);
+		} while (word.compare("from") != 0);
+	}
+	else // select后面出现其他属性
+	{
+		do
+		{ // 添加属性
+			select_attribute_name_list->push_back(word);
+			word = getWord_no_symbol(temp, index);
+		} while (word.compare("from") != 0);
+	}
+	word = getWord_no_symbol(temp, index);
+	/* 结束select处理 */
 
-        /* 处理from句段 */
-        if (word.empty())
-        { // 没有from语句
-            // 表格为空，抛出异常
-            table_not_exist e;
-            throw e;
-        }
-        table_name = word;
-        word = getWord_no_symbol(temp, index);
-        /* 结束from处理 */
+	/* 处理from句段 */
+	if (word.empty())
+	{ // 没有from语句
+		// 表格为空，抛出异常
+		std::cout << "empty table!" << std::endl;
+		return 0;
+		//            table_not_exist e;
+		//            throw e;
+	}
+	table_name = word;
+	word = getWord_no_symbol(temp, index);
+	/* 结束from处理 */
 
-        /* 处理where句段 */
-        if (!word.empty())
-        { // from语句结束非空，说明还有条件
-            if (word.compare("where") != "0")
-            { // from后面不只一个表格，试图访问多个表格
-                multiple_tables e;
-                throw e;
-            }
-            vector<Condition>* conditions;
+	/* 处理where句段 */
+	if (!word.empty())
+	{ // from语句结束非空，说明还有条件
+		if (word.compare("where") != 0)
+		{ // from后面不只一个表格，试图访问多个表格
+			std::cout << "query on multiple tables is not allowed!" << std::endl;
+			return 0;
+			//                multiple_tables e;
+			//                throw e;
+		}
+		vector<Condition>* conditions;
 
-            do
-            {
-                word = getWord_no_symbol(temp, index);
-                if (word.compare("and") == 0)
-                { // 条件之间的逻辑与
-                    word = getWord_no_symbol(word);
-                }
+		do
+		{
+			word = getWord_no_symbol(temp, index);
+			if (word.compare("and") == 0)
+			{ // 条件之间的逻辑与
+				word = getWord_no_symbol(temp, index);
+			}
 
-                // 条件涉及的属性
-                string attribute_name = word;
-                word = getWord(temp, index);
-                // 操作符
-                int operate = -1;
-                switch (word)
-                {
-                    case "=": operate = 0; break;
-                    case "<>": operate = 1; break;
-                    case "<": operate = 2; break;
-                    case ">": operate = 3; break;
-                    case "<=": operate = 4; break;
-                    case ">=": operate = 5; break;
-                    default: break;
-                }
-                if (operate < 0)
-                { // 操作符不合法，抛出异常
-                    invalid_operator e;
-                    throw e;
-                }
-                word = getWord_no_symbol(temp, index);
-                string value = word;
-                // 插入条件
-                conditions->push_back(Condition(attribute_name, value, operate));
-            }
-            while (!word.empty());
-            api->showRecord(table_name, select_attribute_name_list, conditions);
-        }
-        else
-        { // 没有where语句，元组全选
-            api->showRecord(table_name, select_attribute_name_list);
-        }
-    }
-    else if (word.compare("insert") == 0)
-    { // 处理插入
-        word = getWord(temp, index);
-        if (word.compare("into") != 0)
-        { // 只有insert后面没有into
-            insert_syntax_error e;
-            throw e;
-        }
-        word = getWord(temp, index);
-        string table_name = word;
-        word = getWord(temp, index);
-        if (word.compare("values") != 0)
-        { // insert into + 表名后面没有values
-            insert_syntax_error e;
-            throw e;
-        }
-        vector<string>* record_content; // 插入的内容
-        do
-        {
-            word = getWord(temp, index);
-            if (word.compare("(") != 0)
-            { // 值之间没有括号扩起来
-                insert_syntax_error e;
-                throw e;
-            }
-            word = getWord(temp, index);
-            while (word.compare(")") != 0)
-            { // 碰到右括号时，这部分插入停止
-                if (word.empty())
-                { // 不存在右括号
-                    insert_syntax_error e;
-                    throw e;
-                }
-                word = getWord(temp, index);
-                record_content->push_back(word); // 插入的值
-                if (word.compare(",") == 0)
-                { // 略去逗号
-                    word = getWord(temp, index);
-                }
-            }
-            word = getWord(temp, index); // 略去插入值之间的逗号
-        }
-        while (!word.empty());
-        api->insertRecord(string table_name, record_content);
-    }
-    else if (word.compare("delete") == 0)
-    {
-        word = getWord(temp, index);
-        if (word.compare("from") != 0)
-        { // delete from语句错误
-            delete_syntax_error e;
-            throw e;
-        }
-        word = getWord(temp, index);
-        string table_name = word;
-        word = getWord(temp, index);
-        if (word.compare("where") == 0)
-        { // 有条件的删除
-            vector<Condition>* conditions;
-            do
-            {
-                word = getWord_no_symbol(temp, index);
-                if (word.compare("and") == 0)
-                { // 条件之间的逻辑与
-                    word = getWord_no_symbol(word);
-                }
-                // 条件涉及的属性
-                string attribute_name = word;
-                word = getWord(temp, index);
-                // 操作符
-                int operate = -1;
-                switch (word)
-                {
-                    case "=": operate = 0; break;
-                    case "<>": operate = 1; break;
-                    case "<": operate = 2; break;
-                    case ">": operate = 3; break;
-                    case "<=": operate = 4; break;
-                    case ">=": operate = 5; break;
-                    default: break;
-                }
-                if (operate < 0)
-                { // 操作符不合法，抛出异常
-                    invalid_operator e;
-                    throw e;
-                }
-                word = getWord_no_symbol(temp, index);
-                string value = word;
-                // 插入条件
-                conditions->push_back(Condition(attribute_name, value, operate));
-            }
-            while (!word.empty());
-            api->deleteRecord(table_name, conditions);
-        }
-        else if (word.empty())
-        { // 全表删除
-            api->deleteRecord(table_name);
-        }
-        else
-        { // 语法错误
-            delete_syntax_error e;
-            throw e;
-        }
-    }
+			// 条件涉及的属性
+			string attribute_name = word;
+			word = getWord(temp, index);
+			// 操作符
+			int operate = -1;
+			if (word.compare("=") == 0)
+			{
+				operate = 0;
+			}
+			else if (word.compare("<>") == 0)
+			{
+				operate = 1;
+			}
+			else if (word.compare("<") == 0)
+			{
+				operate = 2;
+			}
+			else if (word.compare(">") == 0)
+			{
+				operate = 3;
+			}
+			else if (word.compare("<=") == 0)
+			{
+				operate = 4;
+			}
+			else if (word.compare(">=") == 0)
+			{
+				operate = 5;
+			}
+			else
+			{
+
+			}
+
+			if (operate < 0)
+			{ // 操作符不合法，抛出异常
+//                    invalid_operator e;
+//                    throw e;
+				std::cout << "invalid operator!" << std::endl;
+				return 0;
+			}
+			word = getWord_no_symbol(temp, index);
+			string value = word;
+			// 插入条件
+			conditions->push_back(Condition(attribute_name, value, operate));
+		} while (!word.empty());
+		try
+		{
+			//  api->showRecord(table_name, select_attribute_name_list, conditions);
+		}
+		catch (table_not_exist e)
+		{
+			std::cout << "table \"" << table_name << "\" not exist!" << std::endl;
+		}
+		catch (attribute_not_exist e)
+		{
+			std::cout << "attributes being queried not exist!" << std::endl;
+		}
+	}
+	else
+	{ // 没有where语句，元组全选
+		try
+		{
+			//   api->showRecord(table_name, select_attribute_name_list);
+		}
+		catch (table_not_exist e)
+		{
+			std::cout << "table \"" << table_name << "\" not exist!" << std::endl;
+		}
+		catch (attribute_not_exist e)
+		{
+			std::cout << "attributes being queried not exist!" << std::endl;
+		}
+	}
+	}
+	else if (word.compare("insert") == 0)
+	{ // 处理插入
+	word = getWord(temp, index);
+	if (word.compare("into") != 0)
+	{ // 只有insert后面没有into
+		std::cout << "insert syntax error!" << std::endl;
+		return 0;
+		//            insert_syntax_error e;
+		//            throw e;
+	}
+	word = getWord(temp, index);
+	string table_name = word;
+	word = getWord(temp, index);
+	if (word.compare("values") != 0)
+	{ // insert into + 表名后面没有values
+		std::cout << "insert syntax error!" << std::endl;
+		return 0;
+		//            insert_syntax_error e;
+		//            throw e;
+	}
+	vector<string>* record_content; // 插入的内容
+	do
+	{
+		word = getWord(temp, index);
+		if (word.compare("(") != 0)
+		{ // 值之间没有括号扩起来
+			std::cout << "insert syntax error!" << std::endl;
+			return 0;
+			//                insert_syntax_error e;
+			//                throw e;
+		}
+		word = getWord(temp, index);
+		while (word.compare(")") != 0)
+		{ // 碰到右括号时，这部分插入停止
+			if (word.empty())
+			{ // 不存在右括号
+				std::cout << "insert syntax error!" << std::endl;
+				return 0;
+				//                    insert_syntax_error e;
+				//                    throw e;
+			}
+			word = getWord(temp, index);
+			record_content->push_back(word); // 插入的值
+			if (word.compare(",") == 0)
+			{ // 略去逗号
+				word = getWord(temp, index);
+			}
+		}
+		word = getWord(temp, index); // 略去插入值之间的逗号
+	} while (!word.empty());
+	try
+	{
+		//   api->insertRecord(table_name, record_content);
+	}
+	catch (table_not_exist e)
+	{
+		std::cout << "table \"" << table_name << "\" not exist!" << std::endl;
+	}
+	catch (attribute_not_exist e)
+	{
+		std::cout << "attributes not exist!" << std::endl;
+	}
+	}
+	else if (word.compare("delete") == 0)
+	{
+	word = getWord(temp, index);
+	if (word.compare("from") != 0)
+	{ // delete from语句错误
+		std::cout << "delete syntax error!" << std::endl;
+		return 0;
+		//            delete_syntax_error e;
+		//            throw e;
+	}
+	word = getWord(temp, index);
+	string table_name = word;
+	word = getWord(temp, index);
+	if (word.compare("where") == 0)
+	{ // 有条件的删除
+		vector<Condition>* conditions;
+		do
+		{
+			word = getWord_no_symbol(temp, index);
+			if (word.compare("and") == 0)
+			{ // 条件之间的逻辑与
+				word = getWord_no_symbol(temp, index);
+			}
+			// 条件涉及的属性
+			string attribute_name = word;
+			word = getWord(temp, index);
+			// 操作符
+			int operate = -1;
+			if (word.compare("=") == 0)
+			{
+				operate = 0;
+			}
+			else if (word.compare("<>") == 0)
+			{
+				operate = 1;
+			}
+			else if (word.compare("<") == 0)
+			{
+				operate = 2;
+			}
+			else if (word.compare(">") == 0)
+			{
+				operate = 3;
+			}
+			else if (word.compare("<=") == 0)
+			{
+				operate = 4;
+			}
+			else if (word.compare(">=") == 0)
+			{
+				operate = 5;
+			}
+			else
+			{
+
+			}
+			if (operate < 0)
+			{ // 操作符不合法，抛出异常
+				std::cout << "Invalid operator: \"" << word << "\"!" << std::endl;
+				return 0;
+				//                    invalid_operator e;
+				//                    throw e;
+			}
+			word = getWord_no_symbol(temp, index);
+			string value = word;
+			// 插入条件
+			conditions->push_back(Condition(attribute_name, value, operate));
+		} while (!word.empty());
+		try
+		{
+			//   api->deleteRecord(table_name, conditions);
+		}
+		catch (table_not_exist e)
+		{
+			std::cout << "table \"" << table_name << "\" not exist!" << std::endl;
+		}
+	}
+	else if (word.empty())
+	{ // 全表删除
+		try
+		{
+			//   api->deleteRecord(table_name);
+		}
+		catch (table_not_exist e)
+		{
+			std::cout << "table \"" << table_name << "\" not exist!" << std::endl;
+		}
+	}
+	else
+	{ // 语法错误
+		std::cout << "Syntax Error!" << std::endl;
+		return 0;
+		//            delete_syntax_error e;
+		//            throw e;
+	}
+	}
     else if (word.compare("quit") == 0)
     {
         //退出SQL的操作
+		return 2;
     }
+	else if (word.compare("execfile") == 0)
+	{
+	     word = getWord(temp, index);
+		 string query;
+		 ifstream in(word);
+		 while (!in.eof())
+		 {
+			 getline(in, temp);
+			 query = query + temp;
+			 int pos = query.find(";");
+			 if (pos != query.npos)
+			 {
+				 query.erase(pos);
+				 int condition=interpreter(query);
+				 if (condition == 0)
+				 {
+					 return 0;
+				 }
+				 else if (condition == 2)
+				 {
+					 return 2;
+				 }
+				 query = "";
+			 }
+		 }
+		 in.close();
+    }
+	//success
+	return 1;
 }
 
 
