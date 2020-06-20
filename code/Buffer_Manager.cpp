@@ -130,7 +130,7 @@ int BufferManager::outputPage(int page_id)
 		FILE* f = fopen(filename.c_str(), "r+");
 		if (f == NULL)
 		{
-			std::cout << "File open fail!" << std::endl;
+			std::cout << "File " << filename << " failed to open!" << std::endl;
 			return 0;
 		}
 		fseek(f, PAGESIZE * blockid, SEEK_SET);
@@ -150,7 +150,7 @@ int BufferManager::loadDiskBlock2Page(int page_id, std::string file_name, int bl
 	FILE* f = fopen(file_name.c_str(), "r");
 	if (f == NULL)
 	{
-		std::cout << "File not exist!" << std::endl;
+		std::cout << "File " << file_name << " not exists!" << std::endl;
 		//失败返回
 		return 0;                    
 	}
