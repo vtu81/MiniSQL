@@ -5,7 +5,31 @@ create table student (
 		sgender char (1),
 		primary key ( sno )
 );
-create index stunameidx on student ( sname );
+create index stunameidx 
+on student ( sname );
+
 drop table student;
-drop index stunameidx;
+drop index stunameidx on student;
+
+select * 
+from student;
+select sname, sid 
+from student 
+where grade >= 10
+	and grade <> 30;
+
+
+insert into student 
+values('111', '学生甲', 11, 'F'),
+      ('222', '学生乙', 22, 'M');
+
+delete from student;
+
+delete from student 
+where sname = '111';
+
+delete from student 
+where sname <> '111' and sage = 'F';
+
+
 quit;
