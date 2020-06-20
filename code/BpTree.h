@@ -14,7 +14,7 @@
 // 可能要修改；这个buffer manager可能来自高层模块/全局共用
 // 暂时定义为一个静态全局变量，方便调试
 // To be continued
-static BufferManager bm;
+extern BufferManager buffer_manager;
 
 
 
@@ -701,7 +701,7 @@ void BpTree<Key, Value>::read_from_disk_all()
     int block_num = get_block_num(file_path);
     for (int i = 0; i < block_num; i++)
     {
-        char* page_start = bm.fetchPage(file_path, i);
+        char* page_start = buffer_manager.fetchPage(file_path, i);
         int offset = 0;
         while(offset < PAGESIZE && page_start[offset] != '#')
         {
@@ -733,7 +733,7 @@ void BpTree<Key, Value>::write_back_to_disk_all()
     {
         // std::cout<<"Hello!"<<std::endl;
         int offset = 0; //块内扫描地址偏移
-        char* page_start = bm.fetchPage(file_path, j);
+        char* page_start = buffer_manager.fetchPage(file_path, j);
         memset(page_start, 0, PAGESIZE); //清空缓冲页
         for(i = 0; i < leaf_tmp->key_count; i++)
         {
@@ -749,18 +749,18 @@ void BpTree<Key, Value>::write_back_to_disk_all()
         //块内结束标志'#'
         page_start[offset++] = '#';
         //标记该page为dirty
-        int page_id = bm.fetchPageID(file_path, j);
-        bm.markPageDirty(page_id);
+        int page_id = buffer_manager.fetchPageID(file_path, j);
+        buffer_manager.markPageDirty(page_id);
         //Output for debug.
         if(offset > PAGESIZE) std::cout<<"[debug]Error: In BpTree::write_back_to_disk_all();BpTree node too big! A single page cannot hold it."<<std::endl; //for debug
         leaf_tmp = leaf_tmp->ptrs[leaf_tmp->MAX_KEY];
     }
     //结束块，首字节也为'#'
-    char* page_start = bm.fetchPage(file_path, j);
+    char* page_start = buffer_manager.fetchPage(file_path, j);
     memset(page_start, 0, PAGESIZE); //清空缓冲页
     page_start[0] = '#';
-    int page_id = bm.fetchPageID(file_path, j);
-    bm.markPageDirty(page_id);
+    int page_id = buffer_manager.fetchPageID(file_path, j);
+    buffer_manager.markPageDirty(page_id);
 }
 
 //初始化文件
@@ -789,7 +789,7 @@ int BpTree<Key, Value>::get_block_num(std::string file_path)
     char* tmp;
     int block_num = 0;
     bool initialized = false; //第一个块是否有#号
-    tmp = bm.fetchPage(file_path, block_num);
+    tmp = buffer_manager.fetchPage(file_path, block_num);
 
     //因为文件可能刚刚创建，没有我们自定义的结束符'#'，所以需要单独处理第一个块！
     if(tmp[0] == '#') return 0; //第一个块第一个字节是'#'，表示没有block
@@ -804,12 +804,12 @@ int BpTree<Key, Value>::get_block_num(std::string file_path)
     }
     if(initialized == false) return 0; //第一个块没有'#'，说明这个文件刚刚被创建，同样没有block
     block_num++; //第一个块处理完了，直接从第二个块开始：找到第一个字节是'#'的块，其blockID就是block_num
-    tmp = bm.fetchPage(file_path, block_num); //取第二个块
+    tmp = buffer_manager.fetchPage(file_path, block_num); //取第二个块
     while(tmp[0] != '#')
     {
         block_num++;
         if(block_num > MAXPAGEPOOLSIZE) return -1; //第一个块有'#'，但后面没有任何一个块的开头是'#'，则不是一个符合规范的索引文件
-        tmp = bm.fetchPage(file_path, block_num);
+        tmp = buffer_manager.fetchPage(file_path, block_num);
     }
     return block_num;
 }
