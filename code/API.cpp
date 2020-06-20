@@ -108,7 +108,7 @@ void API::insertRecord(string table_name, vector<string>* record_content) {
 
 void API::deleteRecord(string table_name) {
 	vector<Condition> conditionVector;
-	rm->recordAllDelete(table_name, &conditionVector);
+	deleteRecord(table_name, &conditionVector);
 }
 
 void API::deleteRecord(string table_name, vector<Condition>* conditions) {
@@ -119,13 +119,44 @@ void API::deleteRecord(string table_name, vector<Condition>* conditions) {
 	int num = 0;
 	vector<SingleAttribute> attributeVector;
 	attributeGet(table_name,&attributeVector);
-	if (conditions == NULL) {
+	Attribute attr_info;
+	attr_info = cm->GetAttribute(table_name);
+	bool haveIndex = false;
+	for (int i = 0; i < attr_info.num; i++) {
+		if (attr_info.isindex[i]) {
+			haveIndex = true;
+			break;
+		}
+	}
+	int blockID;
+	int recordSize = recordSizeGet(table_name);
+	if (!haveIndex) {
 		num=rm->recordAllDelete(table_name, conditions);
+		printf("delete %d record in table %s\n", num, table_name.c_str());
 		return;
 	}
-        //暂时还未对删除index值的情况进行处理
-		num = rm->recordAllDelete(table_name, conditions);
-		printf("delete %d record in table %s\n", num, table_name.c_str());
+	else {
+		if (conditions == NULL) {
+			char* recordBegin = bm->fetchPage(table_name, blockID);
+			while (recordBegin[0]!='\0') {
+				deleteRecordIndex(table_name, recordBegin, recordSize, attr_info);
+				blockID++;
+				recordBegin = bm->fetchPage(table_name, blockID);
+			}
+			rm->recordAllDelete(table_name, conditions);
+		}
+		else {
+			char* recordBegin = bm->fetchPage(table_name, blockID);
+			while (recordBegin[0] != '\0') {
+				if (rm->recordConditionFit(recordBegin, recordSize, &attributeVector, conditions)) {
+					deleteRecordIndex(table_name, recordBegin, recordSize, attr_info);
+				}
+				blockID++;
+				recordBegin = bm->fetchPage(table_name, blockID);
+			}
+			rm->recordAllDelete(table_name, conditions);
+		}
+	}
 }
 
 int API::attributeGet(string tableName, vector<SingleAttribute> *attributeVector) {
