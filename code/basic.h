@@ -1,4 +1,5 @@
 #ifndef BASIC_H
+#define BASIC_H
 struct Attribute {
 	/*number of attribute*/
 	int num;
