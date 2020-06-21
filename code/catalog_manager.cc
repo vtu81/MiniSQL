@@ -7,9 +7,9 @@
 #include<cstring>
 
 
-std::vector <Attribute> CatalogManager::GetAllTable(){
+std::vector <std::string> CatalogManager::GetAllTable(){
 
-	return table;
+	return tablelist;
 
 }
 
@@ -66,8 +66,10 @@ void CatalogManager::CreateTable(std::string name, Attribute Attr, int primary, 
     int page_id = BM.fetchPageID(TABLEPATH , blocknumber);
     strcat(buffer , tempstring.c_str());
     BM.markPageDirty(page_id);
-	while (table.size() < tablenum)
-		table.push_back(Attr);
+	while (tablelist.size()<tablenum)
+	{
+		tablelist.push_back(name);
+	}
 }
 
 void CatalogManager::DropTable(std::string name){
