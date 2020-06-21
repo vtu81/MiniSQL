@@ -86,7 +86,7 @@ public:
 	/*get the index of the table*/
 	Index GetIndex(std::string t_name);
 	/*Get all table name*/
-	void GetAllTable(std::vector<Attribute> &List);
+	std::vector <Attribute> GetAllTable();
 private:
     /*tranform numer to string，bit is width of number*/
     std::string numtostr(int num,short bit);
@@ -100,6 +100,7 @@ private:
     int fetchBlockNum(std::string t_name);
 	/*get table information*/
 	Attribute tmp;
+	std::vector <Attribute> table;
 	int tablenum = 0;
 };
 
