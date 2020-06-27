@@ -30,7 +30,7 @@ void API::showRecord(string table_name, vector<string>* attribute_names, vector<
 		cout << "Table doesn't exist!" << endl;
 		return;
 	}
-	if (attribute_names == NULL) {
+	if (attribute_names==NULL) {
 		Attribute temp = cm->GetAttribute(table_name);
 		int i;
 		for (i = 0; i < temp.num; i++) {
@@ -132,16 +132,7 @@ int API::attributeGet(string tableName, vector<SingleAttribute> *attributeVector
 	int i;
 	int type;
 	for (i = 0; i < Attr_info.num; i++) {
-		if (Attr_info.type[i] == -1) {
-			type = 0;
-		}
-		else if (Attr_info.type[i] == 0) {
-			type = -1;
-		}
-		else {
-			type = Attr_info.type[i];
-		}
-		SingleAttribute tmp = SingleAttribute(Attr_info.name[i], type, !Attr_info.repeat[i]);
+		SingleAttribute tmp = SingleAttribute(Attr_info.name[i], Attr_info.type[i], !Attr_info.repeat[i]);
 		attributeVector->push_back(tmp);
 	}
 	return i;
