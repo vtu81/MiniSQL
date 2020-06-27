@@ -1,6 +1,6 @@
 #pragma once
-#ifndef _ATTRIBUTE_H_
-#define _ATTRIBUTE_H_
+#ifndef _SINGLEATTRIBUTE_H_
+#define _SINGLEATTRIBUTE_H_
 
 #include <string>
 #include <iostream>
@@ -11,7 +11,7 @@ class SingleAttribute
 public:
 	//属性名
 	string name;
-	//属性类型，float=-1,int=0,长度为n的string=n
+	//属性类型-1->int,0->float,长度为n的string=n
 	int type;
 	//是否为unique
 	bool ifUnique;
@@ -22,8 +22,8 @@ public:
 
 public:
 	//定义不同类型对应的数
-	int static const TYPE_FLOAT = -1;
-	int static const TYPE_INT = 0;
+	int static const TYPE_FLOAT = 0;
+	int static const TYPE_INT = -1;
 	//返回attribute类型
 	int getType();
 	//返回attribute大小
