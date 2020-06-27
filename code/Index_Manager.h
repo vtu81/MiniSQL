@@ -30,10 +30,10 @@ private:
     
 
 public:
-    //-1表示数据类型为float
-    static const int TYPE_FLOAT = -1;
-    //0表示数据类型为int
-    static const int TYPE_INT = 0;
+    //0表示数据类型为float
+    static const int TYPE_FLOAT = 0;
+    //-1表示数据类型为int
+    static const int TYPE_INT = -1;
     //正数表示数据类型为字符串，且值为字符串长度 + 1; 如34表示char(33)
 
     //构造函数
