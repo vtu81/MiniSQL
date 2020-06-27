@@ -173,14 +173,15 @@ void RecordManager::contentPrint(char* content, int type) {
 
 int RecordManager::recordAllFind(string tableName, vector<Condition>* conditionVector) {
 	int i = 0;
+	int count = 0;
 	string TableFileName = getTableFileName(tableName);
 	char* recordBegin = bm->fetchPage(TableFileName,i);
-	while (recordBegin[0] != '\0') {
-		recordBlockFind(tableName, conditionVector, i);
+	while (!noRecord(tableName,recordBegin)) {
+		count+=recordBlockFind(tableName, conditionVector, i);
 		i++;
 		recordBegin = bm->fetchPage(TableFileName, i);
 	}
-	return i;
+	return count;
 }
 
 int RecordManager::recordBlockFind(string tableName, vector<Condition>* conditionVector, int pageID) {
