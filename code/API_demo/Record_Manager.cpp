@@ -71,15 +71,16 @@ int RecordManager::recordInsert(string tablename, char* record, int recordSize) 
 	int i = 0;
 	string TableFileName = getTableFileName(tablename);
 	char * firstUsableBlock=bm->fetchPage(TableFileName,i);
-	int contentBegin = findContentBegin(firstUsableBlock,recordSize);
-	while (contentBegin + recordSize > PAGESIZE) {
+	int contentBegin = findContentBegin(tablename,firstUsableBlock,recordSize);
+	while (contentBegin==-1||contentBegin + recordSize > PAGESIZE) {
 		i++;
 		firstUsableBlock = bm->fetchPage(TableFileName, i);
-		contentBegin = findContentBegin(firstUsableBlock,recordSize);
+		contentBegin = findContentBegin(tablename,firstUsableBlock,recordSize);
 	}
 	memcpy(firstUsableBlock+contentBegin, record, recordSize);
 	bm->markPageDirty(i);
-
+	return i;
+	
 }
 
 int RecordManager::recordAllShow(string tableName, vector<string>* attributeNameVector, vector<Condition>* conditionVector) {
@@ -87,10 +88,11 @@ int RecordManager::recordAllShow(string tableName, vector<string>* attributeName
 	int count = 0;
 	char* contentBegin = bm->fetchPage(TableFileName.c_str(), 0);
 	int recordSize = api->recordSizeGet(tableName);
-	while (contentBegin[0] != '\0') {
+
+	while (!noRecord(tableName,contentBegin)) {
+		recordBlockShow(tableName, attributeNameVector, conditionVector, count);
 		count++;
 		contentBegin = bm->fetchPage(TableFileName.c_str(), count);
-		recordBlockShow(tableName,attributeNameVector,conditionVector,count);
 	}
 	return count;
 
@@ -99,8 +101,9 @@ int RecordManager::recordAllShow(string tableName, vector<string>* attributeName
 int RecordManager::recordBlockShow(string table_name, vector<string>* attributeNameVector, vector<Condition>* conditionVector, int pageID) {
 	string tableFileName = getTableFileName(table_name);
 	char* recordBegin = bm->fetchPage(tableFileName, pageID);
-	if (recordBegin[0] = '\0') {
+	if (noRecord(table_name,recordBegin)) {
 		return -1;
+		cout << "NO record" << endl;
 	}
 	else {
 		int count = 0;
@@ -108,7 +111,7 @@ int RecordManager::recordBlockShow(string table_name, vector<string>* attributeN
 		int recordSize = api->recordSizeGet(table_name);
 		//将表中的attribute拷贝到attributeVector中
 		api->attributeGet(table_name, &attributeVector);
-		int usingSize = findContentBegin(recordBegin,recordSize);
+		int usingSize = findContentBegin(table_name,recordBegin,recordSize);
 		char* usingBegin = bm->fetchPage(tableFileName, pageID);
 		while (recordBegin - usingBegin < usingSize) {
 			if (recordConditionFit(recordBegin, recordSize, &attributeVector, conditionVector)) {
@@ -186,7 +189,7 @@ int RecordManager::recordBlockFind(string tableName, vector<Condition>* conditio
 	int recordSize = api->recordSizeGet(tableName);
 	char* recordBegin = bm->fetchPage(tableFileName,pageID);
 	char* usingBegin=bm->fetchPage(tableFileName, pageID);
-	int usingSize = findContentBegin(usingBegin,recordSize);
+	int usingSize = findContentBegin(tableName,usingBegin,recordSize);
 	vector<SingleAttribute> attributeVector;
 	api->attributeGet(tableName, &attributeVector);
 	while (recordBegin - usingBegin < usingSize)
@@ -205,7 +208,7 @@ int RecordManager::recordAllDelete(string tableName, vector<Condition>* conditio
 	int i = 0;
 	string TableFileName = getTableFileName(tableName);
 	char* recordBegin = bm->fetchPage(TableFileName, i);
-	while (recordBegin[0] != '\0') {
+	while (!noRecord(tableName,recordBegin)) {
 		recordBlockDelete(tableName, conditionVector, i);
 		i++;
 		recordBegin = bm->fetchPage(TableFileName, i);
@@ -219,7 +222,7 @@ int RecordManager::recordBlockDelete(string tableName, vector<Condition>* condit
 	int count = 0;
 	char* recordBegin = bm->fetchPage(tableFileName, pageID);
 	char* usingBegin = bm->fetchPage(tableFileName, pageID);
-	int usingSize = findContentBegin(usingBegin,recordSize);
+	int usingSize = findContentBegin(tableName,usingBegin,recordSize);
 	vector<SingleAttribute> attributeVector;
 
 	api->attributeGet(tableName, &attributeVector);
@@ -267,7 +270,7 @@ int RecordManager::indexRecordBlockAlreadyInsert(string tableName, string indexN
     int recordSize = api->recordSizeGet(tableName);
 	char* recordBegin = bm->fetchPage(tableFileName, blockID);
 	char* usingBegin = bm->fetchPage(tableFileName, blockID);
-	int usingSize = findContentBegin(usingBegin,recordSize);
+	int usingSize = findContentBegin(tableName,usingBegin,recordSize);
 	vector<SingleAttribute> attributeVector;
 	Attribute tableAttribute = cm->GetAttribute(tableName);
 	
@@ -365,9 +368,9 @@ char* RecordManager::findFirstUsableBlock(string tablename) {
 	return beginBlock;
 }
 
-int RecordManager::findContentBegin(char* block_content,int recordSize) {
+int RecordManager::findContentBegin(string table_name,char* block_content,int recordSize) {
 	int i = 0;
-	while (block_content[i] != '\0'&&i<PAGESIZE) {
+	while (!noRecord(table_name,block_content+i)&&i<PAGESIZE) {
 		i+=recordSize;
 	}
 	if (i >= PAGESIZE) {
@@ -376,4 +379,26 @@ int RecordManager::findContentBegin(char* block_content,int recordSize) {
 	else {
 		return i;
 	}
+}
+
+bool RecordManager::noRecord(string table_name, char* recordBegin) {
+	bool noRecord = true;
+	Attribute table_attr = cm->GetAttribute(table_name);
+	int firstAttrSize;
+	if (table_attr.type[0] == -1) {
+		firstAttrSize = sizeof(int);
+	}
+	else if (table_attr.type[0] == 0) {
+		firstAttrSize = sizeof(float);
+	}
+	else {
+		firstAttrSize = sizeof(char)*table_attr.type[0];
+	}
+	for (int i = 0; i < firstAttrSize; i++) {
+		if (recordBegin[i] != '\0') {
+			noRecord = false;
+			break;
+		}
+	}
+	return noRecord;
 }

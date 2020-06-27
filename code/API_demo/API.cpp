@@ -15,14 +15,13 @@ void API::showRecord(string table_name, vector<string>* attribute_names) {
 		Attribute temp = cm->GetAttribute(table_name);
 		int i;
 		for (i = 0; i < temp.num; i++) {
-			attribute_names->push_back(temp.name[i].c_str());
+			attribute_names->push_back(temp.name[i]);
 		}
 	}
 	for (int j = 0; j < attribute_names->size(); j++) {
-		printf("%s", attribute_names[j]);
-		printf(" ");
+		cout << (*attribute_names)[j] <<" ";
 	}
-	printf("\n");
+	cout << endl;
 	rm->recordAllShow(table_name, attribute_names, &conditions);
 }
 
@@ -31,7 +30,7 @@ void API::showRecord(string table_name, vector<string>* attribute_names, vector<
 		cout << "Table doesn't exist!" << endl;
 		return;
 	}
-	if (attribute_names == NULL) {
+	if (attribute_names==NULL) {
 		Attribute temp = cm->GetAttribute(table_name);
 		int i;
 		for (i = 0; i < temp.num; i++) {
@@ -52,6 +51,7 @@ void API::insertRecord(string table_name, vector<string>* record_content) {
 		return;
 	}
 	string indexName;
+	bool haveIndex = false;
 	Attribute tableAttribute = cm->GetAttribute(table_name);
 	vector<SingleAttribute> attributeVector;
 	vector<Condition> conditionVector;
@@ -62,8 +62,12 @@ void API::insertRecord(string table_name, vector<string>* record_content) {
 			int blockoffest = im->searchIndex(rm->getIndexFileName(table_name, indexName), (*record_content)[i], attributeVector[i].type);
 			if (blockoffest != -1)
 			{
+				//已经存在索引的值
 				cout << "insert fail because index value exist" << endl;
 				return;
+			}
+			else {
+				haveIndex = true;
 			}
 		}
 		else if (attributeVector[i].ifUnique)
@@ -72,6 +76,7 @@ void API::insertRecord(string table_name, vector<string>* record_content) {
 			conditionVector.insert(conditionVector.end(), condition);
 		}
 	}
+
 	if (conditionVector.size() > 0)
 	{
 		for (int i = 0; i < conditionVector.size(); i++) {
@@ -83,32 +88,23 @@ void API::insertRecord(string table_name, vector<string>* record_content) {
 				cout << "insert fail because unique value exist" << endl;
 				return;
 			}
-
 		}
 	}
-
 	char recordString[2000];
 	memset(recordString, 0, 2000);
-
 	recordStringGet(table_name, record_content, recordString);
-
-	int recordSize =recordSizeGet(table_name);
+	int recordSize = recordSizeGet(table_name);
 	int blockOffset = rm->recordInsert(table_name, recordString, recordSize);
-
-	if (blockOffset >= 0)
+	if (haveIndex)
 	{
-		insertRecordIndex(table_name,recordString, recordSize, tableAttribute, blockOffset);
-		printf("insert record into table %s successful\n", table_name.c_str());
+		insertRecordIndex(table_name, recordString, recordSize, tableAttribute, blockOffset);
 	}
-	else
-	{
-		cout << "insert record into table " << table_name << " fail" << endl;
-	}
+	printf("insert record into table %s successful\n", table_name.c_str());
 }
 
 void API::deleteRecord(string table_name) {
 	vector<Condition> conditionVector;
-	rm->recordAllDelete(table_name, &conditionVector);
+	deleteRecord(table_name, &conditionVector);
 }
 
 void API::deleteRecord(string table_name, vector<Condition>* conditions) {
@@ -118,14 +114,14 @@ void API::deleteRecord(string table_name, vector<Condition>* conditions) {
 	}
 	int num = 0;
 	vector<SingleAttribute> attributeVector;
-	attributeGet(table_name,&attributeVector);
-	if (conditions == NULL) {
-		num=rm->recordAllDelete(table_name, conditions);
-		return;
-	}
-        //暂时还未对删除index值的情况进行处理
-		num = rm->recordAllDelete(table_name, conditions);
-		printf("delete %d record in table %s\n", num, table_name.c_str());
+	attributeGet(table_name, &attributeVector);
+	Attribute attr_info;
+	attr_info = cm->GetAttribute(table_name);
+	
+	int blockID;
+	int recordSize = recordSizeGet(table_name);
+	rm->recordAllDelete(table_name, conditions);
+	
 }
 
 int API::attributeGet(string tableName, vector<SingleAttribute> *attributeVector) {
@@ -134,6 +130,7 @@ int API::attributeGet(string tableName, vector<SingleAttribute> *attributeVector
 	}
 	Attribute Attr_info = cm->GetAttribute(tableName);
 	int i;
+	int type;
 	for (i = 0; i < Attr_info.num; i++) {
 		SingleAttribute tmp = SingleAttribute(Attr_info.name[i], Attr_info.type[i], !Attr_info.repeat[i]);
 		attributeVector->push_back(tmp);
@@ -154,13 +151,13 @@ void API::recordStringGet(string tableName, vector<string>* recordContent, char*
 		else typeSize = sizeof(char)*type;
 		stringstream ss;
 		ss << content;
-		if (type == SingleAttribute::TYPE_INT)
+		if (type == -1)
 		{
 			int intTmp;
 			ss >> intTmp;
 			memcpy(contentBegin, ((char*)&intTmp), typeSize);
 		}
-		else if (type == SingleAttribute::TYPE_FLOAT)
+		else if (type == 0)
 		{
 			float floatTmp;
 			ss >> floatTmp;
@@ -193,7 +190,7 @@ int API::recordSizeGet(string tableName) {
 			recordSize += sizeof(char)*attr_info.type[i];
 		}
 	}
-    return recordSize;
+	return recordSize;
 }
 /*Written by 蒋雨舟 END*/
 
@@ -448,14 +445,38 @@ void API::insertRecordIndex(string table_name, char* record_begin, int record_si
 vector<pair<string, int>> API::allIndexInfoGet()
 {
     vector<pair<string, int>> all_index_info;
-    vector<Attribute> all_table_list;
-    cm->GetAllTable(all_table_list);
-    for(auto &i: all_table_list)
+    vector<string> all_table_list;
+    //获取数据库中每一张表的表名
+    all_table_list = cm->GetAllTable();
+    //遍历数据库中每一张表
+    for(auto &table_name: all_table_list)
     {
-        //获取表名
+        //获取当前遍历到的表（名）对应的表信息
+        Attribute attr = cm->GetAttribute(table_name);
+        //获取当前遍历到的表（名）对应的索引信息
+        Index indices_info = cm->GetIndex(table_name);
+        vector<int> attribute_index_id(attr.num, -1); //用于表示对应的attribute索引在indices_info中的编号；先全部初始化为-1
+                                            //-1表示没有索引；否则表示索引编号
+        //标记对应的attribute索引编号
+        for(int i = 0; i < indices_info.num; i++)
+        {
+            attribute_index_id[indices_info.location[i]] = i;
+        }
+        //遍历该表中的每一个属性
+        for(int i = 0; i < attr.num; i++)
+        {
+            //获取当前attribute的种类type
+            int type = attr.type[i];
+            //如果该属性有索引
+            if(attribute_index_id[i] >= 0)
+            {
+                //获取索引文件名
+                string file_name = rm->getIndexFileName(table_name, indices_info.indexname[i]);
+                //将该索引信息记录至all_index_info中
+                all_index_info.push_back(pair<string, int>(file_name, type));
+            }
+        }
     }
-    //To be continued.
-    //需要catalog_manager增加接口，获取所有表名
     return all_index_info;
 }
 /*Written by 谢廷浩 END*/
@@ -493,3 +514,4 @@ bool API::createTable(std::string t_name, Attribute attribute, int primary, Inde
 	return true;
 }
 /*end by 俞晓锋*/
+

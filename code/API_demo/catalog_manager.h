@@ -25,8 +25,6 @@
 class CatalogManager{
 public:
 	BufferManager BM;
-	CatalogManager(){};
-	~CatalogManager(){};
 	/*
 	@parammeter：table_name,attribute_name,primary_key,index
 	Function：insert a table in catalog file
@@ -88,7 +86,7 @@ public:
 	/*get the index of the table*/
 	Index GetIndex(std::string t_name);
 	/*Get all table name*/
-	void GetAllTable(std::vector<Attribute> &List);
+	std::vector <std::string> GetAllTable();
 private:
     /*tranform numer to string，bit is width of number*/
     std::string numtostr(int num,short bit);
@@ -101,7 +99,7 @@ private:
     /*get the size of the file*/
     int fetchBlockNum(std::string t_name);
 	/*get table information*/
-	Attribute tmp;
+	std::vector <std::string> tablelist;
 	int tablenum = 0;
 };
 

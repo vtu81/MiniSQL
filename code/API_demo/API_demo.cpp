@@ -39,9 +39,9 @@ int main(int argc,char * argv[])
     attr.repeat[0] = true;
     attr.repeat[1] = false;
     attr.repeat[2] = false;
-    attr.type[0] = 0;
-    attr.type[1] = 0;
-    attr.type[2] = 0;
+    attr.type[0] = -1;
+    attr.type[1] = -1;
+    attr.type[2] = -1;
     Index ind;
     ind.num = 0;
 
@@ -58,12 +58,13 @@ int main(int argc,char * argv[])
     api.insertRecord("STUDENT", &test_tuple);
     cout << "[operation]API::insertRecord(...) ends" << endl;
 
-    // cout << "[operation]API::showRecord(...) starts" << endl;
-    // vector<string> attr_name;
-    // attr_name.push_back("SID");
-    // attr_name.push_back("CID");
-    // api.showRecord("STUDENT", &attr_name);
-    // cout << "[operation]API::showRecord(...) ends" << endl;
+    cout << "[operation]API::showRecord(...) starts" << endl;
+    vector<string> attr_name;
+    attr_name.push_back("SID");
+    attr_name.push_back("CID");
+    attr_name.push_back("SCORE");
+    api.showRecord("STUDENT", &attr_name);
+    cout << "[operation]API::showRecord(...) ends" << endl;
 
     // cout << "[operation]API::deleteRecord(...) starts" << endl;
     // vector<Condition> test_vec_cond;
