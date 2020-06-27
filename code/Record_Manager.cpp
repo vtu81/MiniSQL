@@ -230,7 +230,7 @@ int RecordManager::recordBlockDelete(string tableName, vector<Condition>* condit
 	Attribute tableAttribute = cm->GetAttribute(tableName);
 	while (recordBegin - usingBegin < usingSize)
 	{
-		if (recordConditionFit(recordBegin, recordSize, &attributeVector, conditionVector))
+		if ((!noRecord(tableName,recordBegin)&&recordConditionFit(recordBegin, recordSize, &attributeVector, conditionVector))
 		{
 			count++;
 
@@ -243,7 +243,7 @@ int RecordManager::recordBlockDelete(string tableName, vector<Condition>* condit
 			memset(recordBegin + i, 0, recordSize);
 			bm->markPageDirty(pageID);
 		}
-		recordBegin += recordSize;
+		else recordBegin += recordSize;
 	}
 
 	return count;
