@@ -445,14 +445,38 @@ void API::insertRecordIndex(string table_name, char* record_begin, int record_si
 vector<pair<string, int>> API::allIndexInfoGet()
 {
     vector<pair<string, int>> all_index_info;
-    vector<Attribute> all_table_list;
-    cm->GetAllTable(all_table_list);
-    for(auto &i: all_table_list)
+    vector<string> all_table_list;
+    //获取数据库中每一张表的表名
+    all_table_list = cm->GetAllTable();
+    //遍历数据库中每一张表
+    for(auto &table_name: all_table_list)
     {
-        //获取表名
+        //获取当前遍历到的表（名）对应的表信息
+        Attribute attr = cm->GetAttribute(table_name);
+        //获取当前遍历到的表（名）对应的索引信息
+        Index indices_info = cm->GetIndex(table_name);
+        vector<int> attribute_index_id(attr.num, -1); //用于表示对应的attribute索引在indices_info中的编号；先全部初始化为-1
+                                            //-1表示没有索引；否则表示索引编号
+        //标记对应的attribute索引编号
+        for(int i = 0; i < indices_info.num; i++)
+        {
+            attribute_index_id[indices_info.location[i]] = i;
+        }
+        //遍历该表中的每一个属性
+        for(int i = 0; i < attr.num; i++)
+        {
+            //获取当前attribute的种类type
+            int type = attr.type[i];
+            //如果该属性有索引
+            if(attribute_index_id[i] >= 0)
+            {
+                //获取索引文件名
+                string file_name = rm->getIndexFileName(table_name, indices_info.indexname[i]);
+                //将该索引信息记录至all_index_info中
+                all_index_info.push_back(pair(file_name, type));
+            }
+        }
     }
-    //To be continued.
-    //需要catalog_manager增加接口，获取所有表名
     return all_index_info;
 }
 /*Written by 谢廷浩 END*/
