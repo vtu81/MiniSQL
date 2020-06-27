@@ -20,6 +20,10 @@ using namespace std;
 
 class RecordManager {
 public:
+	BufferManager *bm;
+	CatalogManager *cm;
+	API *api;
+
 	string getTableFileName(string tablename);
 	string getIndexFileName(string tablename,string indexname);
 	//创建table时调用
@@ -67,7 +71,7 @@ public:
 	int indexRecordAllAlreadyInsert(string tableName, string indexName);
 
 	int recordBlockDelete(string tableName, vector<Condition>* conditionVector, int pageID);
-	
+
 	//检查一条record是否符合conditionVector中的一系列条件
 	//如果全部符合条件，返回true,否则返回false
 	//@recordBegin:指向record记录开始部分的指针
@@ -77,15 +81,10 @@ public:
 	bool recordConditionFit(char* recordBegin, int recordSize, vector<SingleAttribute>* attributeVector, vector<Condition>* conditionVector);
 
 private:
-	
-	BufferManager *bm;
-	CatalogManager *cm;
-	API *api;
 	int recordBlockShow(string tableFileName, vector<string>* attributeNameVector, vector<Condition>* conditionVector, int pageID);
 	int recordBlockFind(string tableName, vector<Condition>* conditionVector, int pageID);
 	int indexRecordBlockAlreadyInsert(string tableName, string indexName, int blockID);
 
-	
 	//检查一条record的某个attribute是否符合condition
 	//符合返回true,不符合返回false
 	//@content:指向record中某一attribute
@@ -97,8 +96,8 @@ private:
 	void contentPrint(char* content, int type);
 
 	char* findFirstUsableBlock(string tablename);
-	int findContentBegin(char* block_content,int recordSize);
-
+	int findContentBegin(string table_name,char* block_content,int recordSize);
+	bool noRecord(string table_name, char* recordBegin);
 };
 
 
