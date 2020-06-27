@@ -473,7 +473,7 @@ vector<pair<string, int>> API::allIndexInfoGet()
                 //获取索引文件名
                 string file_name = rm->getIndexFileName(table_name, indices_info.indexname[i]);
                 //将该索引信息记录至all_index_info中
-                all_index_info.push_back(pair(file_name, type));
+                all_index_info.push_back(pair<string, int>(file_name, type));
             }
         }
     }

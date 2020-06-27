@@ -6,7 +6,7 @@
 #include <vector>
 #include <string>
 #include "Condition.h"
-// #include "SingleAttribute.h" //原本是Attribute.h，现在的Attribute在Basic.h中
+#include "SingleAttribute.h"
 #include "Basic.h"
 /*目录下暂时没有的头文件，以后可能会用到*/
 // #include "IndexInfo.h"
@@ -41,7 +41,7 @@ public:
     //指向全局index manager的指针
     IndexManager *im;
     //指向buffer manager的指针
-	BufferManager *bm;
+	//BufferManager *bm;
 
     /*外部接口*/
     API(){};
