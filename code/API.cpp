@@ -37,11 +37,10 @@ void API::showRecord(string table_name, vector<string>* attribute_names, vector<
 			attribute_names->push_back(temp.name[i].c_str());
 		}
 	}
-	for (int j = 0; j < attribute_names->size(); j++) {
-		printf("%s", attribute_names[j]);
-		printf(" ");
+	for (vector<string>::iterator it = attribute_names->begin(); it != attribute_names->end(); ++it) {
+		cout << *it << " ";
 	}
-	printf("\n");
+	cout << endl;
 	rm->recordAllShow(table_name, attribute_names, conditions);
 }
 
@@ -76,6 +75,7 @@ void API::insertRecord(string table_name, vector<string>* record_content) {
 			conditionVector.insert(conditionVector.end(), condition);
 		}
 	}
+
 
 	if (conditionVector.size() > 0)
 	{
