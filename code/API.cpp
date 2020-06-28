@@ -176,7 +176,8 @@ void API::recordStringGet(string tableName, vector<string>* recordContent, char*
 		}
 		else
 		{
-			memcpy(contentBegin, content.c_str(), typeSize);
+            memset(contentBegin, 0, typeSize);
+			memcpy(contentBegin, content.c_str(), content.length());
 		}
 		contentBegin += typeSize;
 	}
