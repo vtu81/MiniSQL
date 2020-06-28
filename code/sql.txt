@@ -28,7 +28,7 @@ where sno <> '111';
 delete from student 
 where sage >= 33 and sage <> 66 and sgender = 'F';
 
-select sno, sname, sage, sgender 
+select * 
 from student;
 
 delete from student;

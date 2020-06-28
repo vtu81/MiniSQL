@@ -122,7 +122,7 @@ int Interpreter::interpreter(string s)
                 {
                     string attribute_name = word;
                     int type;
-                    bool unique = false;
+                    bool unique = true;
                     word = getWord(temp, index);
                     if (word.compare("int") == 0)
                         type = -1; // TYPE_INT
@@ -171,7 +171,7 @@ int Interpreter::interpreter(string s)
                     word = getWord(temp, index);
                     if (word.compare("unique") == 0)
                     {
-                        unique = true;
+                        unique = false;
                         word = getWord(temp, index);
                     }
                     table_attribute.name[num] = attribute_name;
@@ -221,7 +221,7 @@ int Interpreter::interpreter(string s)
                     {
                         if (table_attribute.name[i] == word)
                         {
-                            table_attribute.repeat[i] = true;
+                            table_attribute.repeat[i] = false;
                             break;
                         }
                     }
@@ -513,7 +513,9 @@ int Interpreter::interpreter(string s)
             } while (!word.empty());
             try
             {
-                  api->showRecord(table_name, select_attribute_name_list, conditions);
+                std::cout << "select result: #################" << std::endl;
+                api->showRecord(table_name, select_attribute_name_list, conditions);
+                std::cout << "################################" << std::endl;
             }
             catch (table_not_exist e)
             {
@@ -530,7 +532,9 @@ int Interpreter::interpreter(string s)
         { // 没有where语句，元组全选
             try
             {
-                   api->showRecord(table_name, select_attribute_name_list);
+                std::cout << "select result: #################" << std::endl;
+                api->showRecord(table_name, select_attribute_name_list);
+                std::cout << "################################" << std::endl;
             }
             catch (table_not_exist e)
             {
