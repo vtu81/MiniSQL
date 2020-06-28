@@ -274,6 +274,11 @@ void API::dropIndex(string table_name, string index_name)
         cout << "Index " << index_name << " on table " << table_name << " not exists!" << endl;
         return;
     }
+    catch(table_not_exist e)
+    {
+        cout << "Table " << table_name << " not exists!" << endl;
+        return;
+    }
 
     //在catalog manager中删除index相关信息
     try
