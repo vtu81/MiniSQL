@@ -96,6 +96,12 @@ void CatalogManager::DropTable(std::string name){
     buffer[currentindex]='\0';
     //mark page
     BM.markPageDirty(pageid);
+/*delete record in tablelist*/
+    std::vector <std::string>::iterator i;
+    for(i=tablelist.begin();i!=tablelist.end();){
+        if(*i==name) tablelist.erase(i);
+        else ++i;
+    }
 }
 
 Attribute CatalogManager::GetAttribute(std::string name){
@@ -336,7 +342,7 @@ bool CatalogManager::IsTable(std::string table_name){
             //name repeat
             else if(GetTableName(buffer, startindex, endindex)==table_name){
                 return true;
-            }
+            } 
             else{
                 //update table index by length
                 startindex+=strtonum(checkbuffer.substr(startindex,4));
