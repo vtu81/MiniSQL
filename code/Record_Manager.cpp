@@ -230,13 +230,12 @@ int RecordManager::recordBlockDelete(string tableName, vector<Condition>* condit
 	Attribute tableAttribute = cm->GetAttribute(tableName);
 	while (recordBegin - usingBegin < usingSize)
 	{
-		if ((!noRecord(tableName,recordBegin)&&recordConditionFit(recordBegin, recordSize, &attributeVector, conditionVector))
+		if (!noRecord(tableName,recordBegin)&&recordConditionFit(recordBegin, recordSize, &attributeVector, conditionVector))
 		{
 			count++;
-
 			api->deleteRecordIndex(tableName, recordBegin, recordSize, tableAttribute);
 			int i = 0;
-			for (i = 0; i + recordSize + recordBegin - usingBegin< usingSize; i++)
+			for (i = 0;i+recordBegin+recordSize<usingBegin+usingSize; i++)
 			{
 				recordBegin[i] = recordBegin[i + recordSize];
 			}
@@ -245,7 +244,6 @@ int RecordManager::recordBlockDelete(string tableName, vector<Condition>* condit
 		}
 		else recordBegin += recordSize;
 	}
-
 	return count;
 }
 
