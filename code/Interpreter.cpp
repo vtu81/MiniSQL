@@ -258,7 +258,6 @@ int Interpreter::interpreter(string s)
                 table_index.num = 0;
                 //连接api
                 api->createTable(tablename, table_attribute, primaryKeyLocation, table_index);
-				std::cout << "Create table successfully" << endl;
             }
             else
             {
@@ -334,7 +333,6 @@ int Interpreter::interpreter(string s)
             }
             //引用api创建index
             api->createIndex(index_name, table_name, attribute_name);
-			std::cout << "Create index successfully" << endl;
         }
         else
         {
@@ -359,7 +357,6 @@ int Interpreter::interpreter(string s)
             else
             {
                 api->dropTable(word);
-				std::cout << "Drop table successfully" << endl;
             }
         }
         else if (word.compare("index") == 0)
@@ -398,7 +395,6 @@ int Interpreter::interpreter(string s)
             else table_name = word;
             //删除索引
             api->dropIndex(table_name, index_name);
-			std::cout << "Drop index successfully" << endl;
         }
         else
         {
