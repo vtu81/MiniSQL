@@ -229,3 +229,117 @@ private:
 + 不同的语句之间以分号`;`作为分隔，在输入sql语句时，也只在碰到分号`;`后才开始执行
 + 可以在运行程序后在命令行直接输入sql语句，或是全部写在文件中`sql.txt`，然后在命令行输入`execfile sql.txt;`后执行
 
+**3.输出说明**
+
+- 如果SQL语句执行成功，执行后会返回成功信息。
+
+  (1) 建表/删除表格
+
+  ```
+  Create table [表名] successfully!
+  Drop table [表名] successfully!
+  ```
+
+  (2)建立索引/删除索引
+
+  ```
+  Create index [索引名] on table [表名] successfully!
+  Drop index [索引名] on table [表名] successfully!
+  ```
+
+  (3)select语句
+
+  若查询结果不为空，则输出第一行为属性名，其余每行表示一条记录。
+
+  ```
+  select result: #################
+            [属性名]
+         [符合条件的记录]
+  ################################
+  ```
+
+  若查询结果为空
+
+  ```
+  select result: #################
+         
+  ################################
+  ```
+
+  (4)insert语句
+
+  ```
+  insert record into table [表名] successfully!
+  ```
+
+  (5)delete语句
+
+  ```
+  
+  ```
+
+  (6)quit语句
+
+  ```
+  Exit program!
+  ```
+
+- 如果SQL语句执行失败，执行后返回失败原因。
+
+  (1) 建表失败可能出现的原因
+
+  ```
+  empty table!
+  create table syntax error!
+  char size overflow!
+  unknown data type
+  primary key not exist!
+  Table [表名] already exists！
+  ```
+
+  (2)建索引失败可能出现的原因
+
+  ```
+  index not exist error!
+  create index syntax error!
+  Table [表名] not exists!
+  Index [索引名] already exists!
+  Indices on table [表名] full!
+  Attribute [属性名] not exists
+  ```
+
+  (3)删除表或索引失败可能出现的原因
+
+  ```
+  empty table!
+  index not exist error!
+  drop index syntax error!
+  Table [表名] not exists!
+  Index [索引名] on table [表名] not exists!
+  ```
+
+  (4)select语句失败可能出现的原因
+
+  ```
+  query on multiple tables is not allowed!
+  empty table!
+  invalid operator!
+  table [表名] not exist！
+  attributes being queried not exist!
+  ```
+
+  (5)insert语句失败可能出现的原因
+
+  ```
+  insert syntax error!
+  table [表名] not exist！
+  attributes being queried not exist!
+  ```
+
+  (6)delete语句失败可能出现的原因
+
+  ```
+  delete syntax error!
+  ```
+
+  
