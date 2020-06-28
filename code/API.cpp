@@ -55,27 +55,19 @@ void API::insertRecord(string table_name, vector<string>* record_content) {
 	vector<SingleAttribute> attributeVector;
 	vector<Condition> conditionVector;
 	attributeGet(table_name, &attributeVector);
-	for (int i = 0; i < attributeVector.size(); i++) {
-		indexName = attributeVector[i].indexNameGet();
-		if (indexName != "") {
-			int blockoffest = im->searchIndex(rm->getIndexFileName(table_name, indexName), (*record_content)[i], attributeVector[i].type);
-			if (blockoffest != -1)
-			{
-				//已经存在索引的值
-				cout << "insert fail because index value exist" << endl;
-				return;
-			}
-			else {
-				haveIndex = true;
-			}
+	for (int i = 0; i <tableAttribute.num; i++) {
+		//indexName = attributeVector[i].indexNameGet();
+		if (tableAttribute.isindex[i]) {
+			cout << "Attribute with index:"<<tableAttribute.name[i] << endl;
+			haveIndex = true;
 		}
 		else if (attributeVector[i].ifUnique)
 		{
 			Condition condition(attributeVector[i].name, (*record_content)[i], Condition::OPERATOR_EQUAL);
 			conditionVector.insert(conditionVector.end(), condition);
 		}
+		
 	}
-
 
 	if (conditionVector.size() > 0)
 	{
