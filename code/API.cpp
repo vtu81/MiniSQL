@@ -11,7 +11,10 @@ void API::showRecord(string table_name, vector<string>* attribute_names) {
 		return;
 	}
 	vector<Condition> conditions;
+    int NULL_flag = 0;
 	if (attribute_names == NULL) {
+        NULL_flag = 1;
+        attribute_names = new vector<string>();
 		Attribute temp = cm->GetAttribute(table_name);
 		int i;
 		for (i = 0; i < temp.num; i++) {
@@ -23,6 +26,7 @@ void API::showRecord(string table_name, vector<string>* attribute_names) {
 	}
 	cout << endl;
 	rm->recordAllShow(table_name, attribute_names, &conditions);
+    if(NULL_flag) delete attribute_names;
 }
 
 void API::showRecord(string table_name, vector<string>* attribute_names, vector<Condition>* conditions) {
@@ -30,7 +34,10 @@ void API::showRecord(string table_name, vector<string>* attribute_names, vector<
 		cout << "Table doesn't exist!" << endl;
 		return;
 	}
+    int NULL_flag = 0;
 	if (attribute_names==NULL) {
+        NULL_flag = 1;
+        attribute_names = new vector<string>();
 		Attribute temp = cm->GetAttribute(table_name);
 		int i;
 		for (i = 0; i < temp.num; i++) {
@@ -42,6 +49,7 @@ void API::showRecord(string table_name, vector<string>* attribute_names, vector<
 	}
 	cout << endl;
 	rm->recordAllShow(table_name, attribute_names, conditions);
+    if(NULL_flag) delete attribute_names;
 }
 
 void API::insertRecord(string table_name, vector<string>* record_content) {
