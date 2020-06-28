@@ -25,7 +25,7 @@ public:
 	API *api;
 
 	string getTableFileName(string tablename);
-	string getIndexFileName(string tablename,string indexname);
+	string getIndexFileName(string tablename, string indexname);
 	//创建table时调用
 	//创建存储table对应的文件
 	//@tablename:table名称
@@ -37,11 +37,11 @@ public:
 	//创建index调用
 	//创建存储index的对应文件
 	//@indexname:index名称
-	int createIndex(string tableName,string indexname);
+	int createIndex(string tableName, string indexname);
 	//删除index时调用
 	//output所有buffer中的block并删除磁盘文件
 	//@indexname:索引名称
-	int dropIndex(string tableName,string indexname);
+	int dropIndex(string tableName, string indexname);
 
 	//插入一条record
 	//将record写入buffer中的page并设置page为dirty
@@ -55,7 +55,7 @@ public:
 	//@attributeNameVector:select后的attribute
 	//@conditionVector:where后的条件
 	int recordAllShow(string tableName, vector<string>* attributeNameVector, vector<Condition>* conditionVector);
-	
+
 	//找出符合条件的record条数并返回
 	//@tableName:表名
 	//@attributeNameVector:select后的attribute
@@ -96,7 +96,7 @@ private:
 	void contentPrint(char* content, int type);
 
 	char* findFirstUsableBlock(string tablename);
-	int findContentBegin(string table_name,char* block_content,int recordSize);
+	int findContentBegin(string table_name, char* block_content, int recordSize);
 	bool noRecord(string table_name, char* recordBegin);
 };
 
