@@ -38,7 +38,7 @@ void API::showRecord(string table_name, vector<string>* attribute_names, vector<
 		}
 	}
 	for (vector<string>::iterator it = attribute_names->begin(); it != attribute_names->end(); ++it) {
-		cout << *it << " ";
+		cout << *it << "\t";
 	}
 	cout << endl;
 	rm->recordAllShow(table_name, attribute_names, conditions);
