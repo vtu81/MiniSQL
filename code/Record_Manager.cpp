@@ -157,17 +157,17 @@ void RecordManager::contentPrint(char* content, int type) {
 	if (type == SingleAttribute::TYPE_INT)
 	{
 		int tmp = *((int *)content); 
-		printf("%d ", tmp);
+		printf("%d\t", tmp);
 	}
 	else if (type == SingleAttribute::TYPE_FLOAT)
 	{
 		float tmp = *((float *)content); 
-		printf("%f ", tmp);
+		printf("%f\t", tmp);
 	}
 	else
 	{
 		string tmp = content;
-		printf("%s ", tmp.c_str());
+		printf("%s\t", tmp.c_str());
 	}
 }
 
