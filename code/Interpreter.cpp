@@ -740,6 +740,11 @@ int Interpreter::interpreter(string s)
         }
         in.close();
     }
+	else
+	{
+	      std::cout << "syntax error!" << std::endl;
+	      return 0;
+    }
     //success
     return 1;
 }

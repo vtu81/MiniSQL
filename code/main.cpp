@@ -27,33 +27,6 @@ int main()
 	Interpreter s;
 	s.api = &api;
 	string query="",temp="";
-	/*query = "create table school (sid char(5), age int, primary key (sid) )";
-	s.interpreter(query);
-	query="create index index_sid on school (sid) ";
-	s.interpreter(query);
-	query = "drop table school ";
-	s.interpreter(query);
-	query = "drop index index_sid";
-	s.interpreter(query); */
-/*	ifstream in("test.txt");
-	while (!in.eof())
-	{
-		getline(in, temp);
-		query = query + temp;
-		int pos = query.find(";");
-		if (pos != query.npos)
-		{
-			query.erase(pos);
-			cout << query << endl;
-			s.interpreter(query);
-			query = "";
-		}
-	}*/
-	//执行SQL脚本文件
-	/*
-	query = "execfile test.txt";
-	s.interpreter(query);
-	*/
 	cout << "-------------MiniSQL interface-------------" << endl;
 	while (1)
 	{
