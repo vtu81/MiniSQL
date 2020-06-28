@@ -5,7 +5,7 @@
 【Windows】（g++编译器）
 
 ```bash
-g++ ./API_demo.cpp ./API.cpp ./Index_Manager.cpp ./Record_Manager.cpp ./catalog_manager.cc ./Buffer_Manager.cpp ./SingleAttribute.cpp ./Condition.cpp
+g++ .\main.cpp .\Interpreter.cpp .\API.cpp .\Index_Manager.cpp .\Record_Manager.cpp .\catalog_manager.cc .\Buffer_Manager.cpp .\SingleAttribute.cpp .\Condition.cpp
 ```
 
 【MacOS】（clang++编译器）
