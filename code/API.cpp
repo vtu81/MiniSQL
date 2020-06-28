@@ -450,9 +450,9 @@ void API::insertRecordIndex(string table_name, char* record_begin, int record_si
     }
 }
 //Index Manager用到的内部函数，获取所有index的信息：<index文件名，index数据类型>
-vector<pair<string, int>> API::allIndexInfoGet()
+vector<pair<string, int> > API::allIndexInfoGet()
 {
-    vector<pair<string, int>> all_index_info;
+    vector<pair<string, int> > all_index_info;
     vector<string> all_table_list;
     //获取数据库中每一张表的表名
     all_table_list = cm->GetAllTable();

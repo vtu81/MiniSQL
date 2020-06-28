@@ -84,7 +84,7 @@ public:
     //内部函数，插入给定地址开始的**一条记录**对应的索引
     void insertRecordIndex(string table_name, char* record_begin, int record_size, Attribute attributes, int blockID);
     //获得所有index的信息：<index文件名，index的type> -- 在Index_Manager.cpp中用于初始化所有index文件
-    vector<pair<string, int>> allIndexInfoGet();
+    vector<pair<string, int> > allIndexInfoGet();
     //To be continued.
 };
 
