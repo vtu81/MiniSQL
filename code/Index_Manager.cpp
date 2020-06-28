@@ -24,7 +24,7 @@ IndexManager::~IndexManager()
         if(i.second)
         {
             i.second->write_back_to_disk_all();
-            //delete i.second;
+            delete i.second;
         }
     }
     for(auto& i: int_index_map_)
@@ -32,7 +32,7 @@ IndexManager::~IndexManager()
         if(i.second)
         {
             i.second->write_back_to_disk_all();
-            //delete i.second;
+            delete i.second;
         }
     }
     for(auto& i: string_index_map_)
@@ -40,7 +40,7 @@ IndexManager::~IndexManager()
         if(i.second)
         {
             i.second->write_back_to_disk_all();
-            //delete i.second;
+            delete i.second;
         }
     }
 }
