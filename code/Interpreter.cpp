@@ -562,9 +562,9 @@ int Interpreter::interpreter(string s)
             //            insert_syntax_error e;
             //            throw e;
         }
-        vector<string>* record_content = new vector<string>(); // 插入的内容
         do
         {
+        	vector<string>* record_content = new vector<string>(); // 插入的内容
             word = getWord(temp, index);
             if (word.compare("(") != 0)
             { // 值之间没有括号扩起来
