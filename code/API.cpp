@@ -19,7 +19,7 @@ void API::showRecord(string table_name, vector<string>* attribute_names) {
 		}
 	}
 	for (int j = 0; j < attribute_names->size(); j++) {
-		cout << (*attribute_names)[j] <<" ";
+		cout << (*attribute_names)[j] <<"\t";
 	}
 	cout << endl;
 	rm->recordAllShow(table_name, attribute_names, &conditions);
