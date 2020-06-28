@@ -508,6 +508,33 @@ bool API::dropTable(std::string t_name)
 {
 	try
 	{
+        //先删除表的所有索引
+        Attribute attributes = cm->GetAttribute(t_name); //保存cm中获取的attribute信息
+        vector<int> attribute_index_id(attributes.num, -1); //用于表示对应的attribute索引在indices_info中的编号；先全部初始化为-1
+                                                            //-1表示没有索引；否则表示索引编号
+        //获取该表的索引信息
+        Index indices_info = cm->GetIndex(t_name);
+        //标记对应的attribute索引编号
+        for (int i = 0; i < indices_info.num; i++)
+        {
+            attribute_index_id[indices_info.location[i]] = i;
+        }
+        //遍历该表中的每一个属性
+        for (int i = 0; i < attributes.num; i++)
+        {
+            //当前属性的type
+            int type = attributes.type[i];
+            //如果该属性有索引
+            if (attribute_index_id[i] >= 0)
+            {
+                //当前属性对应索引名
+                string index_name = indices_info.indexname[attribute_index_id[i]];
+                //将index文件删除
+                rm->dropIndex(t_name, index_name);
+                //删除内存中的索引文件
+                im->dropIndex(rm->getIndexFileName(t_name, index_name), type);
+            }
+        }
 		rm->dropTable(t_name);
 		cm->DropTable(t_name);
 	}
@@ -515,34 +542,6 @@ bool API::dropTable(std::string t_name)
 	{
 		cout << "Table " << t_name << " not exists!" << endl;
 		return false;
-	}
-
-	//接下来删除表的所有索引
-	Attribute attributes = cm->GetAttribute(t_name); //保存cm中获取的attribute信息
-	vector<int> attribute_index_id(attributes.num, -1); //用于表示对应的attribute索引在indices_info中的编号；先全部初始化为-1
-														//-1表示没有索引；否则表示索引编号
-	//获取该表的索引信息
-	Index indices_info = cm->GetIndex(t_name);
-	//标记对应的attribute索引编号
-	for (int i = 0; i < indices_info.num; i++)
-	{
-		attribute_index_id[indices_info.location[i]] = i;
-	}
-	//遍历该表中的每一个属性
-	for (int i = 0; i < attributes.num; i++)
-	{
-		//当前属性的type
-		int type = attributes.type[i];
-		//如果该属性有索引
-		if (attribute_index_id[i] >= 0)
-		{
-			//当前属性对应索引名
-			string index_name = indices_info.indexname[attribute_index_id[i]];
-			//将index文件删除
-			rm->dropIndex(t_name, index_name);
-			//删除内存中的索引文件
-			im->dropIndex(rm->getIndexFileName(t_name, index_name), type);
-		}
 	}
 
 	cout << "Drop table " << t_name << " successfully!" << endl;
