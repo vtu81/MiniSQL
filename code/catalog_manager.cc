@@ -107,7 +107,7 @@ void CatalogManager::DropTable(std::string name){
 Attribute CatalogManager::GetAttribute(std::string name){
     //no such attribute
     if(!IsTable(name)){
-        throw attribute_not_exist();
+        throw table_not_exist();
     }
     //the corresponding block in page
     int blockadress;
