@@ -122,9 +122,20 @@ int API::attributeGet(string tableName, vector<SingleAttribute> *attributeVector
 	}
 	Attribute Attr_info = cm->GetAttribute(tableName);
 	int i;
+	int j;
 	int type;
+	Index attrindex;
 	for (i = 0; i < Attr_info.num; i++) {
 		SingleAttribute tmp = SingleAttribute(Attr_info.name[i], Attr_info.type[i], !Attr_info.repeat[i]);
+		if (Attr_info.isindex[i]) {
+			attrindex = cm->GetIndex(tableName);
+			for (j = 0; j < 10; j++) {
+				if (attrindex.location[j] == i) {
+					tmp.index = attrindex.indexname[j];
+					break;
+				}
+			}
+		}
 		attributeVector->push_back(tmp);
 	}
 	return i;
