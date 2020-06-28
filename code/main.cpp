@@ -57,6 +57,7 @@ int main()
 	cout << "-------------MiniSQL interface-------------" << endl;
 	while (1)
 	{
+		cout << "MiniSQL> " ;
 		getline(cin, temp);//可直接输入execfile test.txt;
 		query = query + temp;
 		int pos = query.find(";");
