@@ -10,7 +10,7 @@ using namespace std;
 
 BufferManager buffer_manager;
 API api;
-CatalogManager catalog_manager;
+CatalogManager catalog_manager(buffer_manager);
 RecordManager record_manager;
 IndexManager index_manager(&api);
 
@@ -23,6 +23,8 @@ int main()
 	record_manager.api = &api;
 	record_manager.bm = &buffer_manager;
 	record_manager.cm = &catalog_manager;
+
+	index_manager.init();
 
 	Interpreter s;
 	s.api = &api;
