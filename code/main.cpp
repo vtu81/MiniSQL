@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <time.h>
 #include "Interpreter.h"
 #include "API.h"
 #include "Catalog_Manager.h"
@@ -28,6 +29,7 @@ int main()
 	Interpreter s;
 	s.api = &api;
 	string query="",temp="";
+	clock_t begin, end;
 	cout << "-------------MiniSQL interface-------------" << endl;
 	while (1)
 	{
@@ -38,14 +40,23 @@ int main()
 		if (pos != query.npos)
 		{
 			query.erase(pos);
+			begin = clock();
 			//返回1代表成功执行，0代表出现bug，2代表退出SQL
 			int condition=s.interpreter(query);
 			if (condition == 0)
-				cout << "Error!" << endl;
+			{
+				// cout << "Error!" << endl;
+			}
 			else if (condition == 2)
 			{
 				cout << "Goodbye!" << endl;
 				break;
+			}
+			else
+			{
+				end = clock();
+				double elapsed_time = (double)(end - begin) / CLOCKS_PER_SEC;
+				printf("(%3.2f sec)\n", elapsed_time);
 			}
 			query = "";
 		}
