@@ -67,9 +67,9 @@ BpNode<Key, Value>::BpNode(int MAX_KEY, bool isLeaf)
 template <class Key, class Value>
 BpNode<Key, Value>::~BpNode()
 {
-    delete keys;
-    delete values;
-    delete ptrs;
+    delete[] keys;
+    delete[] values;
+    delete[] ptrs;
 }
 
 

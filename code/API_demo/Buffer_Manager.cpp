@@ -144,6 +144,16 @@ int BufferManager::outputPage(int page_id)
 	return 0;
 }
 
+void BufferManager::outputFile(std::string file_name)
+{
+	for(int i = 0; i < page_pool_size_; i++)
+	{
+		if(page_pool_[i].getFileName() == file_name)
+			outputPage(i);
+	}
+}
+
+
 int BufferManager::loadDiskBlock2Page(int page_id, std::string file_name, int block_id)
 {
 	// 打开磁盘文件

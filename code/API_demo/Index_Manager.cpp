@@ -5,15 +5,21 @@
 IndexManager::IndexManager(API* api)
 {
     api_ = api;
-    // //保存所有index的信息：<index文件名，index的type>
-    // std::vector<pair<string, int>> all_index_info;
-    // //获取所有index的信息
-    // all_index_info = api->allIndexInfoGet();
-    // //这些索引之前已经创建，因此在磁盘上找到对应的文件进行读取、重构B+树
-    // for(auto &i: all_index_info)
-    // {
-    //     createIndex(i.first, i.second);
-    // }
+}
+
+void IndexManager::init()
+{
+    //保存所有index的信息：<index文件名，index的type>
+    std::vector<pair<string, int>> all_index_info;
+    //获取所有index的信息
+    all_index_info = api_->allIndexInfoGet();
+    //这些索引之前已经创建，因此在磁盘上找到对应的文件进行读取、重构B+树
+    cout << "[debug] In IndexManager::init(); All indices created before: " << endl;
+    for(auto &i: all_index_info)
+    {
+        std::cout << "@" << i.first << endl;
+        createIndex(i.first, i.second);
+    }
 }
 
 IndexManager::~IndexManager()
@@ -24,7 +30,7 @@ IndexManager::~IndexManager()
         if(i.second)
         {
             i.second->write_back_to_disk_all();
-            //delete i.second;
+            delete i.second;
         }
     }
     for(auto& i: int_index_map_)
@@ -32,7 +38,7 @@ IndexManager::~IndexManager()
         if(i.second)
         {
             i.second->write_back_to_disk_all();
-            //delete i.second;
+            delete i.second;
         }
     }
     for(auto& i: string_index_map_)
@@ -40,7 +46,7 @@ IndexManager::~IndexManager()
         if(i.second)
         {
             i.second->write_back_to_disk_all();
-            //delete i.second;
+            delete i.second;
         }
     }
 }
