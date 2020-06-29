@@ -106,17 +106,19 @@ void API::insertRecord(string table_name, vector<string>* record_content) {
 	printf("insert record into table %s successful\n", table_name.c_str());
 }
 
-void API::deleteRecord(string table_name) {
+int API::deleteRecord(string table_name) {
+	int count = 0;
 	vector<Condition> conditionVector;
-	deleteRecord(table_name, &conditionVector);
+	count+=deleteRecord(table_name, &conditionVector);
+	return count;
 }
 
-void API::deleteRecord(string table_name, vector<Condition>* conditions) {
+int API::deleteRecord(string table_name, vector<Condition>* conditions) {
+	int count=0;
 	if (!cm->IsTable(table_name)) {
 		cout << "No such table" << endl;
-		return;
+		return -1;
 	}
-	int num = 0;
 	vector<SingleAttribute> attributeVector;
 	attributeGet(table_name, &attributeVector);
 	Attribute attr_info;
@@ -124,8 +126,8 @@ void API::deleteRecord(string table_name, vector<Condition>* conditions) {
 
 	int blockID;
 	int recordSize = recordSizeGet(table_name);
-	rm->recordAllDelete(table_name, conditions);
-
+	count+=rm->recordAllDelete(table_name, conditions);
+	return count;
 }
 
 int API::attributeGet(string tableName, vector<SingleAttribute> *attributeVector) {
