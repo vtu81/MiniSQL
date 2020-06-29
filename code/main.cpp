@@ -1,7 +1,7 @@
-#include<iostream>
-#include<fstream>
-#include<string>
-#include"Interpreter.h"
+#include <iostream>
+#include <fstream>
+#include <string>
+#include "Interpreter.h"
 #include "API.h"
 #include "Catalog_Manager.h"
 #include "Index_Manager.h"
@@ -16,7 +16,6 @@ IndexManager index_manager(&api);
 
 int main()
 {
-
 	api.cm = &catalog_manager;
 	api.rm = &record_manager;
 	api.im = &index_manager;
@@ -45,13 +44,13 @@ int main()
 				cout << "Error!" << endl;
 			else if (condition == 2)
 			{
-				cout << "Exit program!" << endl;
+				cout << "Goodbye!" << endl;
 				break;
 			}
 			query = "";
 		}
 	}
-	int i;
-	cin >> i;
+	// int i;
+	// cin >> i;
 	return 0;
 }
