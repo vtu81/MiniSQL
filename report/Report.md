@@ -154,8 +154,8 @@ DB Disk Files->Buffer Manager:将磁盘文件指定块读至内存
 
 ​	API模块整合了更底层的Record Manager、Index Manager、Catalog Manager，以实现Interpreter层需要的更为复杂的功能。作为数据库系统的核心，API模块提供给Interpreter的接口包括：创建表、删除表、创建表、删除表、查询记录、插入记录、删除记录。API模块综合调度3个Manager；从Catalog Manager获取表/数据库的信息，进一步调用Record Manager和Index Manager，完成记录和索引的更新或查询。
 
-### 2.3 Catalog Manager (To be continued.)
-
+### 2.3 Catalog Manager
+	Catalog Manager主要记录了所有表的定义信息，将每一个表信息按一定格式记录在文件中，并提供访问记录所有表信息的接口，同时Catalog Manager调用Buffer Manager实际完成完成表的创建、删除等等相关功能。
 
 
 ### 2.4 Record Manager
