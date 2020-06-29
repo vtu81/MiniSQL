@@ -209,14 +209,15 @@ int RecordManager::recordBlockFind(string tableName, vector<Condition>* conditio
 
 int RecordManager::recordAllDelete(string tableName, vector<Condition>* conditionVector) {
 	int i = 0;
+	int count = 0;
 	string TableFileName = getTableFileName(tableName);
 	char* recordBegin = bm->fetchPage(TableFileName, i);
 	while (!noRecord(tableName, recordBegin)) {
-		recordBlockDelete(tableName, conditionVector, i);
+		count+=recordBlockDelete(tableName, conditionVector, i);
 		i++;
 		recordBegin = bm->fetchPage(TableFileName, i);
 	}
-	return i;
+	return count;
 }
 
 int RecordManager::recordBlockDelete(string tableName, vector<Condition>* conditionVector, int pageID) {
