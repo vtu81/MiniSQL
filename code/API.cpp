@@ -136,7 +136,7 @@ void API::insertRecord(string table_name, vector<string>* record_content) {
 	{
 		insertRecordIndex(table_name, recordString, recordSize, tableAttribute, blockOffset);
 	}
-	printf("insert record into table %s successful\n", table_name.c_str());
+	std::cout << "insert record into table " << table_name << " successful" << std::endl;
 }
 
 int API::deleteRecord(string table_name) {

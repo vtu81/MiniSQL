@@ -118,7 +118,7 @@ int RecordManager::recordBlockShow(string table_name, vector<string>* attributeN
 			if (recordConditionFit(recordBegin, recordSize, &attributeVector, conditionVector)) {
 				count++;
 				recordPrint(recordBegin, recordSize, &attributeVector, attributeNameVector);
-				printf("\n");
+				std::cout << std::endl;
 			}
 			recordBegin += recordSize;
 		}
@@ -159,17 +159,17 @@ void RecordManager::contentPrint(char* content, int type) {
 	if (type == SingleAttribute::TYPE_INT)
 	{
 		int tmp = *((int *)content);
-		printf("%d\t", tmp);
+		std::cout << tmp << "\t";
 	}
 	else if (type == SingleAttribute::TYPE_FLOAT)
 	{
 		float tmp = *((float *)content);
-		printf("%f\t", tmp);
+		std::cout << tmp << "\t";
 	}
 	else
 	{
 		string tmp = content;
-		printf("%s\t", tmp.c_str());
+		std::cout << tmp << "\t";
 	}
 }
 
