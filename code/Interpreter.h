@@ -27,4 +27,4 @@ private:
 	//string转int，如果超出范围则返回0
 	int string2num(string s);
 };
-#endif;
+#endif
