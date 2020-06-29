@@ -594,6 +594,68 @@ bool API::createTable(std::string t_name, Attribute attribute, int primary, Inde
 		cout << "Table " << t_name << " already exists!" << endl;
 		return false;
 	}
+
+	/***********************************对主键建立索引开始**************************************/
+	//createIndex("PRIMARY_KEY_" + t_name, t_name, attribute.name[primary]);
+	try
+	{
+		//初始化catalog数据，并检测异常
+		cm->CreateIndex(t_name, attribute.name[primary], "PRIMARY_KEY");
+	}
+	catch (table_not_exist e)
+	{
+		cout << "[debug]In API::createTable(); Table " << t_name << " not exists!" << endl;
+		return false;
+	}
+	catch (attribute_not_exist e)
+	{
+		cout << "[debug]In API::createTable(); Attribute " << t_name << " not exists!" << endl;
+		return false;
+	}
+	catch (index_full e)
+	{
+		cout << "[debug]In API::createTable(); Indices on table " << t_name << " full!" << endl;
+		return false;
+	}
+	catch (index_exist e)
+	{
+		cout << "[debug]In API::createTable(); Index " << "PRIMARY_KEY" << " already exists!" << endl;
+		return false;
+	}
+
+	//至此应该不需要再检测异常了
+
+	//保存cm中获取的attribute信息
+	Attribute attribute_info = cm->GetAttribute(t_name);
+	//保存该index对应的type
+	int type = 0;
+	for (int i = 0; i < attribute_info.num; i++)
+	{
+		if (attribute_info.name[i] == attribute.name[primary])
+		{
+			//找到的type
+			type = attribute_info.type[i];
+			break;
+		}
+		if (i == attribute_info.num)
+		{
+			cout << "[debug]In API::createTable(); Something went wrong!" << endl;
+		}
+	}
+
+	//初始化index文件
+	if (rm->createIndex(t_name, "PRIMARY_KEY") == -1)
+	{
+		cout << "[debug]In API::createTable(); Cannot create index file on disk. Make sure file path ./database/index/ exists!" << endl;
+		return false;
+	}
+
+	//通过im创建真实的B+树index文件
+	im->createIndex(rm->getIndexFileName(t_name, "PRIMARY_KEY"), type);
+	//将已有的record插入index文件中
+	rm->indexRecordAllAlreadyInsert(t_name, "PRIMARY_KEY");
+	/***********************************对主键建立索引结束**************************************/
+
 	cout << "Create table " << t_name << " successfully!" << endl;
 	return true;
 }
