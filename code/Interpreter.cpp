@@ -514,7 +514,8 @@ int Interpreter::interpreter(string s)
             try
             {
                 std::cout << "select result: #################" << std::endl;
-                api->showRecord(table_name, select_attribute_name_list, conditions);
+                int select_count = api->showRecord(table_name, select_attribute_name_list, conditions);
+                std::cout << "select " << select_count << " record(s) on " << table_name << " successfully!" << std::endl;
                 std::cout << "################################" << std::endl;
             }
             catch (table_not_exist e)
@@ -533,7 +534,8 @@ int Interpreter::interpreter(string s)
             try
             {
                 std::cout << "select result: #################" << std::endl;
-                api->showRecord(table_name, select_attribute_name_list);
+                int select_count = api->showRecord(table_name, select_attribute_name_list);
+                std::cout << "select " << select_count << " record(s) on " << table_name << " successfully!" << std::endl;
                 std::cout << "################################" << std::endl;
             }
             catch (table_not_exist e)
@@ -549,6 +551,7 @@ int Interpreter::interpreter(string s)
     else if (word.compare("insert") == 0)
     { // 处理插入
         word = getWord(temp, index);
+        int insert_count = 0; // 插入的记录数目
         if (word.compare("into") != 0)
         { // 只有insert后面没有into
             std::cout << "insert syntax error!" << std::endl;
@@ -598,18 +601,33 @@ int Interpreter::interpreter(string s)
             // 执行插入语句
             try
             {
-                   api->insertRecord(table_name, record_content);
+                api->insertRecord(table_name, record_content);
+                insert_count ++;
             }
             catch (table_not_exist e)
             {
                 std::cout << "table \"" << table_name << "\" not exist!" << std::endl;
+                insert_count = -1;
             }
             catch (attribute_not_exist e)
             {
                 std::cout << "attributes not exist!" << std::endl;
+                insert_count = -1;
             }
             word = getWord(temp, index); // 略去插入值之间的逗号
         } while (!word.empty());
+        if (insert_count >= 0)
+        {
+            std::cout << "insert result:##################" << std::endl;
+            std::cout << "insert " << insert_count << " record(s) on " << table_name << " successfully!" << std::endl;
+            std::cout << "################################" << std::endl;
+        }
+        else
+        {
+            std::cout << "insert result:##################" << std::endl;
+            std::cout << "insert on " << table_name <<  " failed" << std::endl;
+            std::cout << "################################" << std::endl;
+        }
     }
     else if (word.compare("delete") == 0)
     {
@@ -626,6 +644,7 @@ int Interpreter::interpreter(string s)
         word = getWord(temp, index);
         if (word.compare("where") == 0)
         { // 有条件的删除
+            int delete_count = 0;
             vector<Condition>* conditions = new vector<Condition>();
             do
             {
@@ -682,22 +701,43 @@ int Interpreter::interpreter(string s)
             } while (!word.empty());
             try
             {
-                   api->deleteRecord(table_name, conditions);
+                delete_count = api->deleteRecord(table_name, conditions);
             }
             catch (table_not_exist e)
             {
                 std::cout << "table \"" << table_name << "\" not exist!" << std::endl;
+                delete_count = -1;
+            }
+
+            if (delete_count >= 0)
+            {
+                std::cout << "delete result:##################" << std::endl;
+                std::cout << "delete " << delete_count << " record(s) on " << table_name <<" successfully!" << std::endl;
+                std::cout << "################################" << std::endl;
+            }
+            else
+            {
+                std::cout << "delete result:##################" << std::endl;
+                std::cout << "delete on " << table_name << " failed" << std::endl;
+                std::cout << "################################" << std::endl;
             }
         }
         else if (word.empty())
         { // 全表删除
             try
             {
-                   api->deleteRecord(table_name);
+                int delete_count = api->deleteRecord(table_name);
+                std::cout << "delete result:##################" << std::endl;
+                std::cout << "delete " << delete_count << " record(s) on "<< table_name << " successfully!" << std::endl;
+                std::cout << "################################" << std::endl;
             }
             catch (table_not_exist e)
             {
                 std::cout << "table \"" << table_name << "\" not exist!" << std::endl;
+
+                std::cout << "delete result:##################" << std::endl;
+                std::cout << "delete on " << table_name << " failed" << std::endl;
+                std::cout << "################################" << std::endl;
             }
         }
         else

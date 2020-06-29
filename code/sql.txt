@@ -31,9 +31,15 @@ where sage >= 33 and sage <> 66 and sgender = 'F';
 select * 
 from student;
 
-delete from student;
+delete from student 
+where sno = '444';
 
 select sno 
+from student;
+
+delete from student;
+
+select * 
 from student;
 
 
