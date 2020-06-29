@@ -78,11 +78,11 @@ int API::showRecord(string table_name, vector<string>* attribute_names, vector<C
 		if (blockID != -1) break;
 	}
 	if (blockID == -1) {
-		cout << "search without index" << endl;
+		//cout << "search without index" << endl;
 		count += rm->recordAllShow(table_name, attribute_names, conditions);
 	}
 	else {
-		cout << "search with index" << endl;
+		//cout << "search with index" << endl;
 		count+=rm->recordBlockShow(table_name, attribute_names, conditions,blockID);
 	}
 	if (NULL_flag) delete attribute_names;
@@ -103,7 +103,7 @@ void API::insertRecord(string table_name, vector<string>* record_content) {
 	for (int i = 0; i < tableAttribute.num; i++) {
 		//indexName = attributeVector[i].indexNameGet();
 		if (tableAttribute.isindex[i]) {
-			cout << "Attribute with index:" << tableAttribute.name[i] << endl;
+			//cout << "Attribute with index:" << tableAttribute.name[i] << endl;
 			haveIndex = true;
 		}
 		else if (attributeVector[i].ifUnique)
@@ -122,7 +122,7 @@ void API::insertRecord(string table_name, vector<string>* record_content) {
 
 			int recordConflictNum = rm->recordAllFind(table_name, &conditionTmp);
 			if (recordConflictNum > 0) {
-				cout << "insert fail because unique value exist" << endl;
+				cout << "Insert failed because unique value exists!" << endl;
 				return;
 			}
 		}
@@ -136,7 +136,7 @@ void API::insertRecord(string table_name, vector<string>* record_content) {
 	{
 		insertRecordIndex(table_name, recordString, recordSize, tableAttribute, blockOffset);
 	}
-	std::cout << "insert record into table " << table_name << " successful" << std::endl;
+	//std::cout << "insert record into table " << table_name << " successful" << std::endl;
 }
 
 int API::deleteRecord(string table_name) {
@@ -224,7 +224,7 @@ void API::recordStringGet(string tableName, vector<string>* recordContent, char*
 
 int API::recordSizeGet(string tableName) {
 	if (!cm->IsTable(tableName)) {
-		cout << "Table not exist" << endl;
+		cout << "Table not exist!" << endl;
 		return -1;
 	}
 	Attribute attr_info = cm->GetAttribute(tableName);
