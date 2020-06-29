@@ -82,7 +82,8 @@ public:
     int unpinPage(int page_id);
     //将page_pool_中的第page_id个page写到磁盘；返回1表示输出成功，返回0表示输出失败
     int outputPage(int page_id);
-    //int outputPage(int page_id, std::string file_name, int block_id);
+    //将file_name的所有page写到磁盘上
+    void outputFile(std::string file_name);
 
 private:
     //缓冲池首地址指针
