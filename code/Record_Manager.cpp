@@ -27,6 +27,7 @@ int RecordManager::dropTable(string tablename) {
 	// }
 	bm->outputFile(TableFileName);
 	remove(TableFileName.c_str());
+	return 1;
 }
 
 int RecordManager::createIndex(string tableName, string indexname) {
@@ -55,6 +56,7 @@ int RecordManager::dropIndex(string tableName, string indexname) {
 	// }
 	bm->outputFile(IndexFileName);
 	remove(IndexFileName.c_str());
+	return 1;
 }
 
 string RecordManager::getTableFileName(string tablename) {
