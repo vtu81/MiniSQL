@@ -1,6 +1,11 @@
 #### 一、实现功能     
 
-​    具体来说，在buffer manager模块，设计Page和BufferManager对象，并实现相应部分功能。设计相应的demo程序和用于测试和debug。实现如下功能：1.  读取指定的数据到系统缓冲区或将缓冲区中的数据写出到文件。2. 记录缓冲区中各页的状态，如是否被修改过、是否有效等。3. 提供缓冲区页的pin功能，及锁定缓冲区的页，不允许替换出去。(用于替换策略)  4.使用时钟替换算法实现页面替换。
+​    具体来说，在Buffer Manager模块，设计Page和BufferManager对象，并实现相应部分功能。设计相应的demo程序和用于测试和debug。实现如下功能：
+
+1. 读取指定的数据到系统缓冲区或将缓冲区中的数据写出到文件。
+2. 记录缓冲区中各页的状态，如是否被修改过、是否有效等。
+3. 提供缓冲区页的pin功能，及锁定缓冲区的页，不允许替换出去。(用于替换策略)  
+4. 使用时钟替换算法实现页面替换。
 
 ​    而在Interpreter模块中，负责解析SQL语句，并返回相应信息。主要实现了程序流程控制整体框架，即“启动并初始化、接收命令、处理命令、显示命令结果、循环、退出 “流程。同时接收并解释用户输入的命令，生成命令的内部数据结构表示，检查命令的语法正确性和语义正确性，按照要求返回相应信息。
 
@@ -85,6 +90,7 @@ public:
     int pinPage(int page_id);
     int unpinPage(int page_id);
     int outputPage(int page_id);
+    void outputFile(std::string file_name);
 private:
     Page* page_pool_;
     int page_pool_size_;
@@ -116,6 +122,7 @@ private:
 + `markPageDirty()`：标记page_id被修改了，即设为dirty
 + `outputPage()`：将缓冲池中的指定页写到磁盘文件中的指定块
   + `loadDiskBlock2Page()`：将指定文件中的指定block载入指定的page
++ `outputFile()`：将缓冲池中文件名为`file_name`的所有页写到磁盘上
 + `pinPage()`、`unpinPage()`：钉住页面(pin_count++)、解除页面钉住状态(pin_count--)。防止页被替换！
 
 #### 三、Interpreter部分
@@ -345,6 +352,8 @@ private:
   ```
   delete syntax error!
   table [表名] not exist！
+  ```
 ```
   
   
+```
