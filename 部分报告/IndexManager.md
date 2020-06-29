@@ -43,6 +43,9 @@ public:
     //利用API间接调用catalog manager获取各表已有的index，在磁盘上找到对应的文件重构B+树
     IndexManager(API* api);
     
+    //初始化函数
+    void init();
+    
     //析构函数
     //将已有的所有B+树写到磁盘上，释放内存
     ~IndexManager();
@@ -95,7 +98,11 @@ public:
 
 + `IndexManager(API* api)`
 
-  `IndexManager`的构造函数，传入一个API对象的指针用于初始化成员变量`api_`，再利用API初始化以前创建过并保存在磁盘上的所有索引
+  `IndexManager`的构造函数，传入一个API对象的指针用于初始化成员变量`api_`
+
++ `void init()`
+
+  利用API的相关内部函数，初始化本次启动数据库前在磁盘上创建并保存的所有索引至内存中
 
 + `~IndexManager()`
 
