@@ -40,6 +40,9 @@ public:
     //利用API间接调用catalog manager获取各表已有的index，在磁盘上找到对应的文件重构B+树
     IndexManager(API* api);
     
+    //初始化函数
+    void init();
+
     //析构函数
     //将已有的所有B+树写到磁盘上，释放内存
     ~IndexManager();
