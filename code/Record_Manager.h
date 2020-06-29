@@ -79,9 +79,9 @@ public:
 	//@attributeVector:指向一个包含record所有attribute的vector
 	//@conditionVector:指向一个包含所有condition的vector
 	bool recordConditionFit(char* recordBegin, int recordSize, vector<SingleAttribute>* attributeVector, vector<Condition>* conditionVector);
-
+	int recordBlockShow(string table_name, vector<string>* attributeNameVector, vector<Condition>* conditionVector, int pageID);
 private:
-	int recordBlockShow(string tableFileName, vector<string>* attributeNameVector, vector<Condition>* conditionVector, int pageID);
+	
 	int recordBlockFind(string tableName, vector<Condition>* conditionVector, int pageID);
 	int indexRecordBlockAlreadyInsert(string tableName, string indexName, int blockID);
 
