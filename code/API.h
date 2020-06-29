@@ -61,10 +61,10 @@ public:
 	//插入记录
 	void insertRecord(string table_name, vector<string>* record_content);
 	//删除记录 -- 无条件
-	void deleteRecord(string table_name);
+	int deleteRecord(string table_name);
 	//删除记录 -- 有条件
-	void deleteRecord(string table_name, vector<Condition>* conditions);
-
+	int deleteRecord(string table_name, vector<Condition>* conditions);
+	
 	//获取recordSize的函数
 	int recordSizeGet(string tableName);
 	//获取表中SingleAttribute的函数
