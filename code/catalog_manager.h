@@ -10,8 +10,8 @@
 #include <cmath>
 #include <cstring>
 #include <iomanip>
-#include<vector>
-#include "Buffer_Manager.h"
+#include <vector>
+//#include "Buffer_Manager.h"
 #include "Basic.h"
 #include "Exception.h"
 
@@ -21,10 +21,13 @@
 #define MAXFRAMESIZE 100
 #endif
 
+class BufferManager;
 
 class CatalogManager{
 public:
-	BufferManager BM;
+	BufferManager &BM;
+	CatalogManager(BufferManager& b):BM(b),tablelist(){}
+	~CatalogManager(){}
 	/*
 	@parammeter：table_name,attribute_name,primary_key,index
 	Function：insert a table in catalog file

@@ -4,13 +4,32 @@
 //
 
 #include "catalog_manager.h"
+#include "Buffer_Manager.h"
 #include<cstring>
 
 
 std::vector <std::string> CatalogManager::GetAllTable(){
-
-	return tablelist;
-
+    int blocknum=fetchBlockNum(TABLEPATH);
+    if(blocknum<=0)
+        blocknum=1;
+    //look through all blocks
+    for(int blockplace=0;blockplace<blocknum;blockplace++){
+        char* buffer = BM.fetchPage(TABLEPATH, blockplace);
+        std::string buffercheck(buffer);
+        std::string str_tmp="";
+        int start=0,rear=0;
+        do{
+            //# means end
+            if(buffercheck[0]=='#')
+                break;
+            tablelist.push_back(GetTableName(buffer, start, rear));
+            //update start by length
+            start+=strtonum(buffercheck.substr(start,4));
+            if(!start)
+                break;
+        }while(buffercheck[start]!='#');  //end
+    }
+    return tablelist;
 }
 
 void CatalogManager::CreateTable(std::string name, Attribute Attr, int primary, Index index){
@@ -96,7 +115,6 @@ void CatalogManager::DropTable(std::string name){
     buffer[currentindex]='\0';
     //mark page
     BM.markPageDirty(pageid);
-/*delete record in tablelist*/
     std::vector <std::string>::iterator i;
     for(i=tablelist.begin();i!=tablelist.end();){
         if(*i==name) tablelist.erase(i);
