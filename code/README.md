@@ -29,6 +29,6 @@ clang++ -o main.out main.cpp Interpreter.cpp API.cpp Index_Manager.cpp Record_Ma
 （2）运行现成的测试集
 
 ```bash
-clang++ -o test.out .\test.cpp .\Interpreter.cpp .\API.cpp .\Index_Manager.cpp .\Record_Manager.cpp .\catalog_manager.cpp .\Buffer_Manager.cpp .\SingleAttribute.cpp .\Condition.cpp
+clang++ -o test.out test.cpp Interpreter.cpp API.cpp Index_Manager.cpp Record_Manager.cpp catalog_manager.cpp Buffer_Manager.cpp SingleAttribute.cpp Condition.cpp
 ```
 
