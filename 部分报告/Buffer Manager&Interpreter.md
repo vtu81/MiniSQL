@@ -253,7 +253,7 @@ private:
 
   ```
   select result: #################
-            [属性名]
+            [选择的属性名]
          [符合条件的记录]
   ################################
   ```
@@ -262,20 +262,24 @@ private:
 
   ```
   select result: #################
-         
+  [选择的属性名]
   ################################
   ```
 
   (4)insert语句
 
   ```
-  insert record into table [表名] successfully!
+  insert result:##################
+  insert [插入记录的数目] record(s) into [表名] successfully!
+  ################################
   ```
 
   (5)delete语句
 
   ```
-  
+  delete result:##################
+  delete [输出记录的数目] record(s) on [表名] successfully!
+  ################################
   ```
 
   (6)quit语句
@@ -340,6 +344,7 @@ private:
 
   ```
   delete syntax error!
-  ```
-
+  table [表名] not exist！
+```
+  
   
