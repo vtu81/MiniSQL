@@ -5,22 +5,20 @@
 【Windows】（g++编译器）
 
 ```bash
-g++ .\main.cpp .\Interpreter.cpp .\API.cpp .\Index_Manager.cpp .\Record_Manager.cpp .\catalog_manager.cc .\Buffer_Manager.cpp .\SingleAttribute.cpp .\Condition.cpp
+g++ .\main.cpp .\Interpreter.cpp .\API.cpp .\Index_Manager.cpp .\Record_Manager.cpp .\Catalog_Manager.cpp .\Buffer_Manager.cpp .\SingleAttribute.cpp .\Condition.cpp
 ```
 
 【MacOS】（clang++编译器）
 
 ```bash
-clang++ main.cpp Interpreter.cpp API.cpp Index_Manager.cpp Record_Manager.cpp catalog_manager.cc Buffer_Manager.cpp SingleAttribute.cpp Condition.cpp
+clang++ main.cpp Interpreter.cpp API.cpp Index_Manager.cpp Record_Manager.cpp Catalog_Manager.cpp Buffer_Manager.cpp SingleAttribute.cpp Condition.cpp
 ```
 
 + 如果编译失败，请检查你的g++/clang++版本/支持的C++标准
 
-+ 具体demo内容参见`main()`函数所在文件`API_demo.cpp`
-
-+ 目前`IndexManager`的构造函数有一部分不能正常工作，需待`CatalogManager::GetAllTable()`相关代码调整后再进一步debug，故现在每次创建的索引在磁盘上记录后不能在下次启动数据库时重新读取，敬请留意！
-
 + API模块的接口包括，可能仍存在若干问题，有待排查
+
++ 现在利用索引查询时会提示search with index，后期可能需要注释掉
 
   ```c++
   //创建表
