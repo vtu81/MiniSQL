@@ -26,7 +26,11 @@ class BufferManager;
 class CatalogManager{
 public:
 	BufferManager &BM;
-	CatalogManager(BufferManager& b):BM(b),tablelist(){}
+	CatalogManager(BufferManager& b):BM(b),tablelist()
+	{
+		init();
+	}
+	void init();
 	~CatalogManager(){}
 	/*
 	@parammeter：table_name,attribute_name,primary_key,index

@@ -7,6 +7,22 @@
 #include "Buffer_Manager.h"
 #include<cstring>
 
+void CatalogManager::init()
+{
+    //create catalog file
+    FILE* f = fopen(TABLEPATH, "r");
+    if (f == NULL) {
+        f = fopen(TABLEPATH, "w+");
+        char* p = BM.fetchPage(TABLEPATH, 0);
+        int block_id = BM.fetchPageID(TABLEPATH, 0);
+        p[0] = '#';
+        BM.outputPage(block_id);
+        fclose(f);
+        f = fopen(TABLEPATH , "r");
+        fclose(f);
+    }
+    fclose(f);
+}
 
 std::vector <std::string> CatalogManager::GetAllTable(){
     int blocknum=fetchBlockNum(TABLEPATH);
