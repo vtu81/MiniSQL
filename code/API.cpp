@@ -51,7 +51,40 @@ int API::showRecord(string table_name, vector<string>* attribute_names, vector<C
 		cout << *it << "\t";
 	}
 	cout << endl;
-	count += rm->recordAllShow(table_name, attribute_names, conditions);
+	Attribute table_attr = cm->GetAttribute(table_name);
+	int blockID=-1;
+	int m, n, k;
+	string IndexName;
+	string IndexKey;
+	int type=-2;
+	Index tmpIndex;
+	for (m = 0; m < conditions->size(); m++) {
+		if ((*conditions)[m].operate == Condition::OPERATOR_EQUAL) {
+			for (n = 0; n < table_attr.num; n++) {
+				if (table_attr.name[n] == (*conditions)[m].attributeName&&table_attr.isindex[n]) {
+					tmpIndex = cm->GetIndex(table_name);
+					for (k = 0; k < tmpIndex.num; k++) {
+						if (tmpIndex.location[k] == n) {
+							IndexName = tmpIndex.indexname[k];
+							IndexKey = (*conditions)[m].value;
+							type = table_attr.type[n];
+						}
+					}
+					blockID = im->searchIndex(rm->getIndexFileName(table_name, IndexName), IndexKey, type);
+					break;
+				}
+			}
+		}
+		if (blockID != -1) break;
+	}
+	if (blockID == -1) {
+		cout << "search without index" << endl;
+		count += rm->recordAllShow(table_name, attribute_names, conditions);
+	}
+	else {
+		cout << "search with index" << endl;
+		count+=rm->recordBlockShow(table_name, attribute_names, conditions,blockID);
+	}
 	if (NULL_flag) delete attribute_names;
 	return count;
 }
