@@ -17,14 +17,15 @@ int RecordManager::createTable(string tablename) {
 
 int RecordManager::dropTable(string tablename) {
 	string TableFileName = getTableFileName(tablename);
-	int i = 0;
-	int PageID = bm->fetchPageID(TableFileName.c_str(), i);
-	while (PageID != PAGENOTEXIST) {
-		//这里把所有block都output一遍
-		bm->outputPage(PageID);
-		i++;
-		PageID = bm->fetchPageID(TableFileName.c_str(), i);
-	}
+	// int i = 0;
+	// int PageID = bm->fetchPageID(TableFileName.c_str(), i);
+	// while (PageID != PAGENOTEXIST) {
+	// 	//这里把所有block都output一遍
+	// 	bm->outputPage(PageID);
+	// 	i++;
+	// 	PageID = bm->fetchPageID(TableFileName.c_str(), i);
+	// }
+	bm->outputFile(TableFileName);
 	remove(TableFileName.c_str());
 }
 
@@ -44,14 +45,15 @@ int RecordManager::createIndex(string tableName, string indexname) {
 
 int RecordManager::dropIndex(string tableName, string indexname) {
 	string IndexFileName = getIndexFileName(tableName, indexname);
-	int i = 0;
-	int PageID = bm->fetchPageID(IndexFileName.c_str(), i);
-	while (PageID != PAGENOTEXIST) {
-		//这里把所有block都output一遍
-		bm->outputPage(PageID);
-		i++;
-		PageID = bm->fetchPageID(IndexFileName.c_str(), i);
-	}
+	// int i = 0;
+	// int PageID = bm->fetchPageID(IndexFileName.c_str(), i);
+	// while (PageID != PAGENOTEXIST) {
+	// 	//这里把所有block都output一遍
+	// 	bm->outputPage(PageID);
+	// 	i++;
+	// 	PageID = bm->fetchPageID(IndexFileName.c_str(), i);
+	// }
+	bm->outputFile(IndexFileName);
 	remove(IndexFileName.c_str());
 }
 
