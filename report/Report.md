@@ -53,7 +53,7 @@
 
 #### 表定义
 
-​	一个表最多可以定义32个属性，各属性可以指定是否为`unique`；支持单属性的主键定义
+​	一个表最多可以定义32个属性，各属性可以指定是否为`unique`；必须定义单属性的主键
 
 #### 索引的建立和删除
 
@@ -1275,7 +1275,7 @@ private:
 
 ### 6.1 创建表语句
 
-####6.1.1 成功建表
+#### 6.1.1 成功建表
 
 sql语句：
 
@@ -1291,9 +1291,9 @@ create table student (
 
 执行结果：建表成功，学生表格包含属性学号（sid），年龄（sage），性别（sex），其中学号被声明为主键
 
-![create_table](C:\Users\pc\Documents\GitHub\MiniSQL\report\img\create_table.png)
+<img src="./img/image-20200630150311727.png" alt="image-20200630150311727" style="zoom:50%;" />
 
-####6.1.2 建立同名的表
+#### 6.1.2 建立同名的表
 
 sql语句：
 
@@ -1308,7 +1308,7 @@ create table student (
 
 执行结果：建表失败，因为已经存在student表。
 
-<img src="/Users/panicarada/Library/Application Support/typora-user-images/image-20200630150407095.png" alt="image-20200630150407095" style="zoom:50%;" />
+<img src="./img/image-20200630150407095.png" alt="image-20200630150407095" style="zoom:50%;" />
 
 #### 6.1.3 未知的数据类型
 
@@ -1324,7 +1324,7 @@ create table student_wrong_type (
 
 执行结果：建表失败，因为不支持数据类型"date"
 
-<img src="/Users/panicarada/Library/Application Support/typora-user-images/image-20200630150559436.png" alt="image-20200630150559436" style="zoom:50%;" />
+<img src="./img/image-20200630150559436.png" alt="image-20200630150559436" style="zoom:50%;" />
 
 #### 6.1.4 创建索引
 
@@ -1336,7 +1336,7 @@ create index stuAgeIndex on student(sage);
 
 执行结果：成功创建索引
 
-<img src="/Users/panicarada/Library/Application Support/typora-user-images/image-20200630154446659.png" alt="image-20200630154446659" style="zoom:50%;" />
+<img src="./img/image-20200630154446659.png" alt="image-20200630154446659" style="zoom:50%;" />
 
 
 
@@ -1360,9 +1360,9 @@ values ('1', 11, 89.1, 'F'),
 
 执行结果：插入成功，向表格添加了八个学生的记录。
 
-<img src="/Users/panicarada/Library/Application Support/typora-user-images/image-20200630151209042.png" alt="image-20200630151209042" style="zoom:50%;" />
+<img src="./img/image-20200630151209042.png" alt="image-20200630151209042" style="zoom:50%;" />
 
-####6.2.2 插入重复的主键
+#### 6.2.2 插入重复的主键
 
 sql语句：
 
@@ -1373,9 +1373,9 @@ values ('6', 110, 100, 'F');
 
 执行结果：插入失败，因为已经存在学号为6的学生。
 
-<img src="/Users/panicarada/Library/Application Support/typora-user-images/image-20200630151807132.png" alt="image-20200630151807132" style="zoom:50%;" />
+<img src="./img/image-20200630151807132.png" alt="image-20200630151807132" style="zoom:50%;" />
 
-####6.2.3 插入的数据类型不匹配
+#### 6.2.3 插入的数据类型不匹配
 
 sql语句：多插入了一个数据。
 
@@ -1386,7 +1386,7 @@ values ('9', 11, 232, 'F', 1);
 
 执行结果：插入失败，提示语法错误。
 
-<img src="/Users/panicarada/Library/Application Support/typora-user-images/image-20200630152242214.png" alt="image-20200630152242214" style="zoom:50%;" />
+<img src="./img/image-20200630152242214.png" alt="image-20200630152242214" style="zoom:50%;" />
 
 ### 6.3 查询语句
 
@@ -1400,7 +1400,7 @@ select * from student;
 
 执行结果：正确显示了6.2.1中成功插入的学生信息。
 
-<img src="/Users/panicarada/Library/Application Support/typora-user-images/image-20200630152707418.png" alt="image-20200630152707418" style="zoom:50%;" />
+<img src="./img/image-20200630152707418.png" alt="image-20200630152707418" style="zoom:50%;" />
 
 #### 6.3.2 无条件投影查询
 
@@ -1413,7 +1413,7 @@ from student;
 
 执行结果：正确地将所有记录投影到学号（sid）与成绩（grade）
 
-<img src="/Users/panicarada/Library/Application Support/typora-user-images/image-20200630152836823.png" alt="image-20200630152836823" style="zoom:50%;" />
+<img src="./img/image-20200630152836823.png" alt="image-20200630152836823" style="zoom:50%;" />
 
 #### 6.3.3 单条件查询
 
@@ -1427,7 +1427,7 @@ where grade > 90;
 
 执行结果：有四名学生分数超过90
 
-<img src="/Users/panicarada/Library/Application Support/typora-user-images/image-20200630153131179.png" alt="image-20200630153131179" style="zoom:50%;" />
+<img src="./img/image-20200630153131179.png" alt="image-20200630153131179" style="zoom:50%;" />
 
 #### 6.3.4 复合条件查询
 
@@ -1441,7 +1441,7 @@ where grade > 90 and sex = 'M' and sage <> 21;
 
 执行结果：有两名学生符合要求
 
-<img src="/Users/panicarada/Library/Application Support/typora-user-images/image-20200630153426565.png" alt="image-20200630153426565" style="zoom:50%;" />
+<img src="./img/image-20200630153426565.png" alt="image-20200630153426565" style="zoom:50%;" />
 
 #### 6.3.5 空查询
 
@@ -1455,7 +1455,7 @@ where grade > 95;
 
 执行结果：没有学生符合要求
 
-<img src="/Users/panicarada/Library/Application Support/typora-user-images/image-20200630154210242.png" alt="image-20200630154210242" style="zoom:50%;" />
+<img src="./img/image-20200630154210242.png" alt="image-20200630154210242" style="zoom:50%;" />
 
 ### 6.4 删除语句
 
@@ -1471,9 +1471,9 @@ select * from student;
 
 执行结果：学号为5、6、8的学生被删除
 
-<img src="/Users/panicarada/Library/Application Support/typora-user-images/image-20200630154845103.png" alt="image-20200630154845103" style="zoom:50%;" />
+<img src="./img/image-20200630154845103.png" alt="image-20200630154845103" style="zoom:50%;" />
 
-<img src="/Users/panicarada/Library/Application Support/typora-user-images/image-20200630154859932.png" alt="image-20200630154859932" style="zoom:50%;" />
+<img src="./img/image-20200630154859932.png" alt="image-20200630154859932" style="zoom:50%;" />
 
 #### 6.4.2 复合条件删除
 
@@ -1487,9 +1487,9 @@ select * from student;
 
 执行结果：学号为2的学生被删除
 
-<img src="/Users/panicarada/Library/Application Support/typora-user-images/image-20200630155043410.png" alt="image-20200630155043410" style="zoom:50%;" />
+<img src="./img/image-20200630155043410.png" alt="image-20200630155043410" style="zoom:50%;" />
 
-<img src="/Users/panicarada/Library/Application Support/typora-user-images/image-20200630155053318.png" alt="image-20200630155053318" style="zoom:50%;" />
+<img src="./img/image-20200630155053318.png" alt="image-20200630155053318" style="zoom:50%;" />
 
 #### 6.4.3 空删除
 
@@ -1502,7 +1502,7 @@ where grade > 95;
 
 执行结果：没有记录被删除
 
-<img src="/Users/panicarada/Library/Application Support/typora-user-images/image-20200630155157924.png" alt="image-20200630155157924" style="zoom:50%;" />
+<img src="./img/image-20200630155157924.png" alt="image-20200630155157924" style="zoom:50%;" />
 
 #### 6.4.4 全表记录删除
 
@@ -1515,9 +1515,9 @@ select * from student;
 
 执行结果：剩余的四条记录全被删除
 
-<img src="/Users/panicarada/Library/Application Support/typora-user-images/image-20200630155322072.png" alt="image-20200630155322072" style="zoom:50%;" />
+<img src="./img/image-20200630155322072.png" alt="image-20200630155322072" style="zoom:50%;" />
 
-<img src="/Users/panicarada/Library/Application Support/typora-user-images/image-20200630155744723.png" alt="image-20200630155744723" style="zoom:50%;" />
+<img src="./img/image-20200630155744723.png" alt="image-20200630155744723" style="zoom:50%;" />
 
 ### 6.5 drop语句
 
@@ -1531,7 +1531,7 @@ drop index stuAgeIndex on student(sage);
 
 执行结果：删除成功
 
-<img src="/Users/panicarada/Library/Application Support/typora-user-images/image-20200630155526881.png" alt="image-20200630155526881" style="zoom:50%;" />
+<img src="./img/image-20200630155526881.png" alt="image-20200630155526881" style="zoom:50%;" />
 
 #### 6.5.2 删除不存在的索引
 
@@ -1543,7 +1543,7 @@ drop index stuAgeIndex on student(sage);
 
 执行结果：删除失败，因为索引不存在
 
-<img src="/Users/panicarada/Library/Application Support/typora-user-images/image-20200630155715832.png" alt="image-20200630155715832" style="zoom:50%;" />
+<img src="./img/image-20200630155715832.png" alt="image-20200630155715832" style="zoom:50%;" />
 
 #### 6.5.3 删除存在的表格
 
@@ -1555,7 +1555,7 @@ drop table student;
 
 执行结果：删除成功
 
-<img src="/Users/panicarada/Library/Application Support/typora-user-images/image-20200630155828942.png" alt="image-20200630155828942" style="zoom:50%;" />
+<img src="./img/image-20200630155828942.png" alt="image-20200630155828942" style="zoom:50%;" />
 
 #### 6.5.4 删除不存在的表格
 
@@ -1567,7 +1567,7 @@ drop table student;
 
 执行结果：删除失败，因为表格不存在
 
-<img src="/Users/panicarada/Library/Application Support/typora-user-images/image-20200630155918657.png" alt="image-20200630155918657" style="zoom:50%;" />
+<img src="./img/image-20200630155918657.png" alt="image-20200630155918657" style="zoom:50%;" />
 
 ### 6.6 退出MiniSQL
 
@@ -1579,7 +1579,7 @@ quit;
 
 执行结果：Goodbye!
 
-<img src="/Users/panicarada/Library/Application Support/typora-user-images/image-20200630160447983.png" alt="image-20200630160447983" style="zoom:50%;" />
+<img src="./img/image-20200630160447983.png" alt="image-20200630160447983" style="zoom:50%;" />
 
 ### 6.7 执行SQL脚本文件
 
@@ -1632,5 +1632,6 @@ execfile sql.sql;
 
 执行结果：运行成功。
 
-<img src="/Users/panicarada/Library/Application Support/typora-user-images/image-20200630160328806.png" alt="image-20200630160328806" style="zoom:50%;" />
+<img src="./img/image-20200630160328806.png" alt="image-20200630160328806" style="zoom:50%;" />
+
 
