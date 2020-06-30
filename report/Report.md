@@ -183,7 +183,7 @@ DB Disk Files->Buffer Manager:将磁盘文件指定块读至内存
 ## 三、分工说明
 
 + 谢廷浩：负责部分Buffer Manager模块、部分API模块、Index Manager驱动部分的设计、B+树与磁盘交互的实现，并进行了全局的debug，将各个模块串联起来。
-+ To be continued.
++ 黄仁泓：定义Page类，完成部分BufferManager函数；定义Interpreter类，完成创建删除表格、索引、执行文件等功能，实现MiniSQL界面等
 
 ## 四、各模块提供接口与内部实现
 
@@ -546,10 +546,16 @@ public:
 ### 4.3 Catalog Manager 
 ​	Catalog Manager模块将表的创建、删除功能实现的相关代码封装在`CatalogManager`类中，相对应的代码"CatalogManager.h"和“CatalogManager.cpp”中，此外还提供了提供了一些方便API调用的接口。
 #### `CatalogManager`类
-```C++
+```c++
 class CatalogManager{
 public:
-	BufferManager BM;
+	BufferManager &BM;
+	CatalogManager(BufferManager& b):BM(b),tablelist()
+	{
+		init();
+	}
+	void init();
+	~CatalogManager(){}
 	/*
 	@parammeter：table_name,attribute_name,primary_key,index
 	Function：insert a table in catalog file
@@ -631,69 +637,69 @@ private:
 
 **成员变量**
 
-+`BM`:Buffer Manager的指针
++ `BM`：Buffer Manager的引用
 
-+`TableList`：用于记录已创建表的指针链表
++ `TableList`：用于记录已创建表的指针链表
 
-+`tablenum`:用来记录现有的表的数量
++ `tablenum`:用来记录现有的表的数量
 
 **成员函数**
 
-+`void CreateTable(std::string t_name, Attribute attribute, int primary, Index index)`
++ `void CreateTable(std::string t_name, Attribute attribute, int primary, Index index)`
 
 创建一个新表记录，并通过调用Buffer Manager为其分配一个内存page，输入变量位**表名**、**列名**、**主键位置**、**索引**
 
-+`void DropTable(std::string t_name)`
++ `void DropTable(std::string t_name)`
 
 根据输入的**表名**删掉对应的表的记录，并相应回收已分配的内存。
 
-+`void CreateIndex(std::string t_name, std::string a_name, std::string i_name)`
++ `void CreateIndex(std::string t_name, std::string a_name, std::string i_name)`
 
 创建一个新的索引，输入分别为**表名**、**列名**、**索引名**
 
-+`std::string IndextoAttr(std::string t_name, std::string i_name)`
++ `std::string IndextoAttr(std::string t_name, std::string i_name)`
 
 通过输入的**表名**、**索引名**搜索对应的一个列
 
-+`void DropIndex(std::string t_name, std::string i_name)`
++ `void DropIndex(std::string t_name, std::string i_name)`
 
 通过输入的**表名**、**索引名**删除对应的一个列
 
-+`bool IsTable(std::string t_name)`
++ `bool IsTable(std::string t_name)`
 
 通过输入的**表名**判断是否已经有相同名字的表存在
 
-+`bool IsAttribute(std::string t_name , std::string a_name)`
++ `bool IsAttribute(std::string t_name , std::string a_name)`
 
 通过输入的**表名**、**列名**判断是否已经有相同名字的列存在
 
-+`Attribute GetAttribute(std::string t_name)`
++ `Attribute GetAttribute(std::string t_name)`
 
 由输入的**表名**得到其中所有的列名
 
-+`void PrintTable(std::string t_name)`
++ `void PrintTable(std::string t_name)`
 
 由输入的**表名**得到该表的所有
 
-+`Index GetIndex(std::string t_name)`
++ `Index GetIndex(std::string t_name)`
 
 由输入的**表名**的到该表的索引
 
-+`std::vector <std::string> GetAllTable()`
++ `std::vector <std::string> GetAllTable()`
 
 返回已有的所有表名
 
-+`std::string numtostr(int num,short bit)`
++ `std::string numtostr(int num,short bit)`
 
 将数字转化成便于记录的字符串
 
-+`int strtonum(std::string str)`
++ `int strtonum(std::string str)`
 
 将记录中的字符串转化成为数字
 
-+`std::string GetTableName(std::string buffer,int start,int &rear)`
++ `std::string GetTableName(std::string buffer,int start,int &rear)`
 
-通过输入的buffer指针和需要搜索的始末位置，从已开辟的内存page中得到所有记录中的表名
+通过传入的Buffer Manager和需要搜索的始末位置，从已开辟的内存Page中得到所有记录中的表名
 
 
 ### 4.4 Record Manager
