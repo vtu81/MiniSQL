@@ -11,7 +11,7 @@ mingw32-make -B
 ./MiniSQL.exe
 ```
 
-对于Linux/Unix用户，需要先安装**GNU Make**工具，在当前目录下运行如下命令以编译**MiniSQL**：
+对于MacOS/Linux/Unix用户，需要先安装**GNU Make**工具，在当前目录下运行如下命令以编译**MiniSQL**：
 
 ```bash
 make -B
@@ -34,9 +34,9 @@ make -B
 
 ## 清除编译文件
 
-对于Windows用户，需要手动删除"./src"目录中的所有".o"文件，并删除当前目录下的"MiniSQL.exe"。
+对于Windows用户，需要手动删除"./src/"目录中的所有".o"文件，并删除当前目录下的"MiniSQL.exe"。
 
-对于Linux/Unix用户，执行如下命令即可：
+对于MacOS/Linux/Unix用户，执行如下命令即可：
 
 ```bash
 make clean
@@ -50,7 +50,7 @@ Windows用户在当前目录下运行**MiniSQL**：
 ./MiniSQL.exe
 ```
 
-Linux/Unix用户在当前目录下运行**MiniSQL**：
+MacOS/Linux/Unix用户在当前目录下运行**MiniSQL**：
 
 ```bash
 ./MiniSQL
@@ -72,5 +72,5 @@ Linux/Unix用户在当前目录下运行**MiniSQL**：
   + "./database/index/"目录
   + "./database/record/"目录
 
-+ "./database/catalog"文件不需要自行创建；但Linux用户在丢失原有的"./database/catalog"文件后首次运行**MiniSQL**时可能会报错导致**MiniSQL**无法正常运行，可以忽略相关报错，再次运行**MiniSQL**即可。
++ "./database/catalog"文件不需要自行创建；但MacOS/Linux/Unix用户在丢失原有的"./database/catalog"文件后首次运行**MiniSQL**时可能会报错导致**MiniSQL**无法正常运行，可以忽略相关报错，再次运行**MiniSQL**即可。
 + 当然，假如"./database/catalog"文件在多次运行**MiniSQL**后仍然没有自动创建，请自行新建空的"./database/catalog"文件，并增加一个字符"#"，作为文件的首字节。
