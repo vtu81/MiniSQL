@@ -1290,7 +1290,7 @@ create table student (
 
 执行结果：建表成功，学生表格包含属性学号（sid），年龄（sage），性别（sex），其中学号被声明为主键
 
-<img src="/Users/panicarada/Library/Application Support/typora-user-images/image-20200630150311727.png" alt="image-20200630150311727" style="zoom:50%;" />
+![create_table](C:\Users\pc\Documents\GitHub\MiniSQL\report\img\create_table.png)
 
 ####6.1.2 建立同名的表
 
