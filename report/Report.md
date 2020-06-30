@@ -183,7 +183,8 @@ DB Disk Files->Buffer Manager:将磁盘文件指定块读至内存
 ## 三、分工说明
 
 + 谢廷浩：负责部分Buffer Manager模块、部分API模块、Index Manager驱动部分的设计、B+树与磁盘交互的实现，并进行了全局的debug，将各个模块串联起来。
-+ 黄仁泓：定义Page类，完成部分BufferManager函数；定义Interpreter类，完成创建删除表格、索引、执行文件等功能，实现MiniSQL界面等
++ 黄仁泓：定义Page类，完成部分BufferManager函数；定义Interpreter类，完成创建删除表格、索引、执行文件等功能，实现MiniSQL界面等。
++ 邱泽鸿：实现B+树基本操作（构建、查询、插入、删除、析构等），参与Interpreter类的编写，实现对sql查询语句、删除记录语句、插入记录语句的解析。
 
 ## 四、各模块提供接口与内部实现
 
@@ -1269,4 +1270,365 @@ private:
 ![exit](./img/exit.png)
 
 ## 六、系统测试
+
+### 6.1 创建表语句
+
+####6.1.1 成功建表
+
+sql语句：
+
+```mysql
+create table student (
+		sid char(5) unique,
+		sage int,
+  	grade float,
+		sex char(1),
+		primary key (sid)
+);
+```
+
+执行结果：建表成功，学生表格包含属性学号（sid），年龄（sage），性别（sex），其中学号被声明为主键
+
+<img src="/Users/panicarada/Library/Application Support/typora-user-images/image-20200630150311727.png" alt="image-20200630150311727" style="zoom:50%;" />
+
+####6.1.2 建立同名的表
+
+sql语句：
+
+```mysql
+create table student (
+		sid char(5) unique,
+		sage int,
+		sex char(1),
+		primary key (sid)
+);
+```
+
+执行结果：建表失败，因为已经存在student表。
+
+<img src="/Users/panicarada/Library/Application Support/typora-user-images/image-20200630150407095.png" alt="image-20200630150407095" style="zoom:50%;" />
+
+#### 6.1.3 未知的数据类型
+
+sql语句：
+
+```mysql
+create table student_wrong_type (
+		sid char(5) unique,
+		birthday date, 
+		primary key (sid)
+);
+```
+
+执行结果：建表失败，因为不支持数据类型"date"
+
+<img src="/Users/panicarada/Library/Application Support/typora-user-images/image-20200630150559436.png" alt="image-20200630150559436" style="zoom:50%;" />
+
+#### 6.1.4 创建索引
+
+sql语句：
+
+```mysql
+create index stuAgeIndex on student(sage);
+```
+
+执行结果：成功创建索引
+
+<img src="/Users/panicarada/Library/Application Support/typora-user-images/image-20200630154446659.png" alt="image-20200630154446659" style="zoom:50%;" />
+
+
+
+### 6.2 插入记录语句
+
+#### 6.2.1 成功插入
+
+sql语句：
+
+```mysql
+insert into student 
+values ('1', 11, 89.1, 'F'), 
+			 ('2', 22, 89.2, 'M'),
+			 ('3', 23, 89.4, 'F'),
+			 ('4', 21, 91.23,'M'),
+			 ('5', 24, 92.24,'F'),
+			 ('6', 25, 93.21,'M'),
+			 ('7', 24, 89.4,'F'),
+			 ('8', 25, 92.24,'M');
+```
+
+执行结果：插入成功，向表格添加了八个学生的记录。
+
+<img src="/Users/panicarada/Library/Application Support/typora-user-images/image-20200630151209042.png" alt="image-20200630151209042" style="zoom:50%;" />
+
+####6.2.2 插入重复的主键
+
+sql语句：
+
+```mysql
+insert into student
+values ('6', 110, 100, 'F');
+```
+
+执行结果：插入失败，因为已经存在学号为6的学生。
+
+<img src="/Users/panicarada/Library/Application Support/typora-user-images/image-20200630151807132.png" alt="image-20200630151807132" style="zoom:50%;" />
+
+####6.2.3 插入的数据类型不匹配
+
+sql语句：多插入了一个数据。
+
+```mysql
+insert into student
+values ('9', 11, 232, 'F', 1);
+```
+
+执行结果：插入失败，提示语法错误。
+
+<img src="/Users/panicarada/Library/Application Support/typora-user-images/image-20200630152242214.png" alt="image-20200630152242214" style="zoom:50%;" />
+
+### 6.3 查询语句
+
+#### 6.3.1 无条件全表查询
+
+sql语句：查询所有的学生信息。
+
+```mysql
+select * from student;
+```
+
+执行结果：正确显示了6.2.1中成功插入的学生信息。
+
+<img src="/Users/panicarada/Library/Application Support/typora-user-images/image-20200630152707418.png" alt="image-20200630152707418" style="zoom:50%;" />
+
+#### 6.3.2 无条件投影查询
+
+sql语句：查询所有学生的学号与成绩。
+
+```mysql
+select sid, grade
+from student;
+```
+
+执行结果：正确地将所有记录投影到学号（sid）与成绩（grade）
+
+<img src="/Users/panicarada/Library/Application Support/typora-user-images/image-20200630152836823.png" alt="image-20200630152836823" style="zoom:50%;" />
+
+#### 6.3.3 单条件查询
+
+sql语句：查询分数超过90的学生的信息。
+
+```mysql
+select *
+from student
+where grade > 90;
+```
+
+执行结果：有四名学生分数超过90
+
+<img src="/Users/panicarada/Library/Application Support/typora-user-images/image-20200630153131179.png" alt="image-20200630153131179" style="zoom:50%;" />
+
+#### 6.3.4 复合条件查询
+
+sql语句：查询分数超过90的男性学生的信息，并要求年龄不为21。
+
+```mysql
+select * 
+from student
+where grade > 90 and sex = 'M' and sage <> 21;
+```
+
+执行结果：有两名学生符合要求
+
+<img src="/Users/panicarada/Library/Application Support/typora-user-images/image-20200630153426565.png" alt="image-20200630153426565" style="zoom:50%;" />
+
+#### 6.3.5 空查询
+
+sql语句：查询分数超过95的学生（不存在）
+
+```mysql
+select *
+from student
+where grade > 95;
+```
+
+执行结果：没有学生符合要求
+
+<img src="/Users/panicarada/Library/Application Support/typora-user-images/image-20200630154210242.png" alt="image-20200630154210242" style="zoom:50%;" />
+
+### 6.4 删除语句
+
+#### 6.4.1 单条件删除
+
+sql语句：删除成绩超过92的学生
+
+```mysql
+delete from student
+where grade > 92;
+select * from student;
+```
+
+执行结果：学号为5、6、8的学生被删除
+
+<img src="/Users/panicarada/Library/Application Support/typora-user-images/image-20200630154845103.png" alt="image-20200630154845103" style="zoom:50%;" />
+
+<img src="/Users/panicarada/Library/Application Support/typora-user-images/image-20200630154859932.png" alt="image-20200630154859932" style="zoom:50%;" />
+
+#### 6.4.2 复合条件删除
+
+sql语句：删除分数低于90的男性
+
+```mysql
+delete from student
+where grade < 90 and sex = 'M';
+select * from student;
+```
+
+执行结果：学号为2的学生被删除
+
+<img src="/Users/panicarada/Library/Application Support/typora-user-images/image-20200630155043410.png" alt="image-20200630155043410" style="zoom:50%;" />
+
+<img src="/Users/panicarada/Library/Application Support/typora-user-images/image-20200630155053318.png" alt="image-20200630155053318" style="zoom:50%;" />
+
+#### 6.4.3 空删除
+
+sql语句：删除分数超过95的学生（不存在）
+
+```mysql
+delete from student
+where grade > 95;
+```
+
+执行结果：没有记录被删除
+
+<img src="/Users/panicarada/Library/Application Support/typora-user-images/image-20200630155157924.png" alt="image-20200630155157924" style="zoom:50%;" />
+
+#### 6.4.4 全表记录删除
+
+sql语句：
+
+```mysql
+delete from student;
+select * from student;
+```
+
+执行结果：剩余的四条记录全被删除
+
+<img src="/Users/panicarada/Library/Application Support/typora-user-images/image-20200630155322072.png" alt="image-20200630155322072" style="zoom:50%;" />
+
+<img src="/Users/panicarada/Library/Application Support/typora-user-images/image-20200630155744723.png" alt="image-20200630155744723" style="zoom:50%;" />
+
+### 6.5 drop语句
+
+#### 6.5.1 删除存在的索引
+
+sql语句：删除在6.1.4创建的年龄索引
+
+```mysql
+drop index stuAgeIndex on student(sage);
+```
+
+执行结果：删除成功
+
+<img src="/Users/panicarada/Library/Application Support/typora-user-images/image-20200630155526881.png" alt="image-20200630155526881" style="zoom:50%;" />
+
+#### 6.5.2 删除不存在的索引
+
+sql语句：删除在6.5.1中已经被删除的索引
+
+```mysql
+drop index stuAgeIndex on student(sage);
+```
+
+执行结果：删除失败，因为索引不存在
+
+<img src="/Users/panicarada/Library/Application Support/typora-user-images/image-20200630155715832.png" alt="image-20200630155715832" style="zoom:50%;" />
+
+#### 6.5.3 删除存在的表格
+
+sql语句：删除student表格
+
+```mysql
+drop table student;
+```
+
+执行结果：删除成功
+
+<img src="/Users/panicarada/Library/Application Support/typora-user-images/image-20200630155828942.png" alt="image-20200630155828942" style="zoom:50%;" />
+
+#### 6.5.4 删除不存在的表格
+
+sql语句：删除6.5.3中已经删除的student表格
+
+```mysql
+drop table student;
+```
+
+执行结果：删除失败，因为表格不存在
+
+<img src="/Users/panicarada/Library/Application Support/typora-user-images/image-20200630155918657.png" alt="image-20200630155918657" style="zoom:50%;" />
+
+### 6.6 退出MiniSQL
+
+语句：
+
+```mysql
+quit;
+```
+
+执行结果：Goodbye!
+
+<img src="/Users/panicarada/Library/Application Support/typora-user-images/image-20200630160447983.png" alt="image-20200630160447983" style="zoom:50%;" />
+
+### 6.7 执行SQL脚本文件
+
+#### 6.7.1 文件sql.sql内容
+
+```mysql
+create table student (
+		sno char (8), 
+		sname char(16) unique, 
+		sage int, 
+		sgender char (1), 
+		primary key ( sno ) 
+);
+create index stunameidx 
+on student ( sname );
+insert into student 
+values('111', 'A', 11, 'F'),
+      ('222', 'B', 22, 'M'),
+      ('333', 'C', 33, 'F'),
+      ('444', 'D', 44, 'M'),
+      ('555', 'E', 55, 'F'),
+      ('666', 'F', 66, 'M'),
+      ('777', 'G', 77, 'F');
+select sno, sname, sage, sgender 
+from student 
+where sno <> '111';
+delete from student 
+where sage >= 33 and sage <> 66 and sgender = 'F';
+select * 
+from student;
+delete from student 
+where sno = '444';
+select sno 
+from student;
+delete from student;
+select * 
+from student;
+drop index stunameidx on student;
+drop table student;
+quit;
+```
+
+#### 6.7.2 execfile语句
+
+语句：
+
+```mysql
+execfile sql.sql;
+```
+
+执行结果：运行成功。
+
+<img src="/Users/panicarada/Library/Application Support/typora-user-images/image-20200630160328806.png" alt="image-20200630160328806" style="zoom:50%;" />
 

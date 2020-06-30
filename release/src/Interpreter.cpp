@@ -515,7 +515,14 @@ int Interpreter::interpreter(string s)
             {
                 std::cout << "select result: #################" << std::endl;
                 int select_count = api->showRecord(table_name, select_attribute_name_list, conditions);
-                std::cout << "select " << select_count << " record(s) on " << table_name << " successfully!" << std::endl;
+                if (select_count <= 0)
+                {
+                    std::cout << "No record is selected" << std::endl;
+                }
+                else
+                {   
+                    std::cout << "select " << select_count << " record(s) on " << table_name << " successfully!" << std::endl;
+                }
                 std::cout << "################################" << std::endl;
             }
             catch (table_not_exist e)
@@ -535,7 +542,14 @@ int Interpreter::interpreter(string s)
             {
                 std::cout << "select result: #################" << std::endl;
                 int select_count = api->showRecord(table_name, select_attribute_name_list);
-                std::cout << "select " << select_count << " record(s) on " << table_name << " successfully!" << std::endl;
+                if (select_count <= 0)
+                {
+                    std::cout << "No record is selected" << std::endl;
+                }
+                else
+                {   
+                    std::cout << "select " << select_count << " record(s) on " << table_name << " successfully!" << std::endl;
+                }
                 std::cout << "################################" << std::endl;
             }
             catch (table_not_exist e)
@@ -614,6 +628,7 @@ int Interpreter::interpreter(string s)
                 std::cout << "attributes not exist!" << std::endl;
                 insert_count = -1;
             }
+            
             word = getWord(temp, index); // 略去插入值之间的逗号
         } while (!word.empty());
         if (insert_count >= 0)
