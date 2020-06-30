@@ -185,6 +185,7 @@ DB Disk Files->Buffer Manager:将磁盘文件指定块读至内存
 + 谢廷浩：负责部分Buffer Manager模块、部分API模块、Index Manager驱动部分的设计、B+树与磁盘交互的实现，并进行了全局的debug，将各个模块串联起来。
 + 黄仁泓：定义Page类，完成部分BufferManager函数；定义Interpreter类，完成创建删除表格、索引、执行文件等功能，实现MiniSQL界面等。
 + 邱泽鸿：实现B+树基本操作（构建、查询、插入、删除、析构等），参与Interpreter类的编写，实现对sql查询语句、删除记录语句、插入记录语句的解析。
++ 俞晓锋：定义了Catalog Manager模块，定义了Index类和Attribute类，完成了表格创建、删除信息的记录和索引信息记录，同时调用了Buffer Manager创建、删除表格、索引。以及API中与Catalog Manager相关部分的设计。
 
 ## 四、各模块提供接口与内部实现
 
