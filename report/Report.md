@@ -14,7 +14,13 @@
 
 <div style="margin: 0 auto;text-align: center;font-size: 40px;font-weight: bold"><text>MiniSQL设计报告</text></div>
 
+
+
   	<p style="text-align: center;font-size: 25px;">第12组</p>
+
+<center style="font-size:15px">蒋雨舟 3170104955&nbsp &nbsp谢廷浩 3180101944&nbsp &nbsp邱泽鸿 3180101966<br/>
+黄仁泓 3180101969&nbsp &nbsp俞晓锋 3180105878
+</center>
 
 
 
@@ -24,12 +30,6 @@
 <p style="text-align: center;font-size: 20px">
 指导教师： <u>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp庄越挺&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</u>
 </p>
-
-
-
-
-
-
 
 
 
